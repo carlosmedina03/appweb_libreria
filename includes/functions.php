@@ -1,15 +1,20 @@
 <?php
-// ============================================================
-// RESPONSABLE: Rol 4 (Ayudantes)
-// REQUERIMIENTO: Formatos generales del sistema
-// ============================================================
+// REQUERIMIENTO: "Formato monetario: 2 decimales, separador decimal '.'"
+// ==========================================
 
-// Función: formato_moneda($cantidad)
-// REQ: "Formato monetario: 2 decimales, separador decimal '.'" (Ej: 1234.50)
 function formato_moneda($cantidad) {
+    // Ejemplo: 1234.5 -> "1,234.50"
     return number_format($cantidad, 2, '.', ',');
 }
 
-// Función: sanear_input($data)
-// Seguridad básica para XSS.
+function sanear($mysqli, $string) {
+    return $mysqli->real_escape_string(trim($string));
+}
+
+function json_response($data, $status = 200) {
+    http_response_code($status);
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit;
+}
 ?>
