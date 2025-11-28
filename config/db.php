@@ -1,9 +1,17 @@
 <?php
-// Responsable: Rol 4 (Back-End)
-// Descripción: Conexión global a base de datos usando MySQLi.
+// ============================================================
+// RESPONSABLE: Rol 4 (Back-End)
+// REQUERIMIENTO: "PHP + MySQLi"
+// ============================================================
 $host = 'localhost';
 $user = 'root';
-$pass = '';
+$pass = ''; // Ajustar según XAMPP
 $db   = 'libreria_db';
-// $mysqli = new mysqli(...);
+
+$mysqli = new mysqli($host, $user, $pass, $db);
+$mysqli->set_charset("utf8mb4");
+
+if ($mysqli->connect_error) {
+    die("Error de conexión: " . $mysqli->connect_error);
+}
 ?>

@@ -1,0 +1,6 @@
+/* RESPONSABLE: Rol 2 (UX-UI) */
+/* Estilos generales de la aplicación web (No impresión) */
+/* Maquetación responsiva (desktop/móvil) */
+body { font-family: sans-serif; }
+.navbar { /* ... */ }
+.card-producto { /* Para vista móvil */ }
