@@ -12,7 +12,7 @@ VALUES (1, 'Librería Universitaria S.A. de C.V.', 'LUN230101XYZ', 'Av. del Cono
 -- 2. Usuario Admin y Operador
 -- La contraseña real para entrar será: 12345
 -- El valor insertado abajo es el HASH generado por password_hash('12345', PASSWORD_DEFAULT)
-SET @password_hash = '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm';
+SET @password_hash = '$2y$10$KgeAaNy.gtpPiWnOmWRF8OLrZ.wfJI4eEeQlvixFcRRqCZioMEj6a';
 
 INSERT INTO usuarios (nombre_completo, username, password, rol) 
 VALUES 
