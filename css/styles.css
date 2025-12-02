@@ -1,6 +1,347 @@
 /* RESPONSABLE: Rol 2 (UX-UI) */
 /* Estilos generales de la aplicación web (No impresión) */
 /* Maquetación responsiva (desktop/móvil) */
-body { font-family: sans-serif; }
-.navbar { /* ... */ }
-.card-producto { /* Para vista móvil */ }
+
+
+/* ==========================
+   ESTILO BASE
+========================== */
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #E1580F, #9C0722);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-attachment: fixed;
+  color: #222;
+}
+
+/* Contenedor principal centrado (login) */
+.container {
+  width: 100%;
+  max-width: 450px;
+  background: #fff;
+  padding: 22px;
+  border-radius: 10px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+}
+
+/* ==========================
+   LOGO
+========================== */
+.logo {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.logo img {
+  width: 200px;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto 8px;
+}
+
+.logo h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* ==========================
+   FORMULARIO
+========================== */
+
+form {
+  display: block;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+  width: 90%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+
+
+input:focus,
+
+select:focus,
+
+textarea:focus {
+  border-color: #C82B1D;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(200,43,29,0.15);
+}
+
+/* ==========================
+   BOTONES
+========================== */
+button,
+.btn {
+  padding: 10px;
+  background: #9C0722;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+
+
+button:hover,
+.btn:hover {
+  background: #A72115;
+}
+
+
+
+/* Botón secundario */
+.btn-secondary {
+  background: #9C0722;
+}
+
+.btn-secondary:hover {
+  background: #A72115;
+}
+
+/* ==========================
+   NAVBAR (para index, compras, devoluciones)
+========================== */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 98%;
+  height: 70px; /* ajusta según tu diseño */
+  background: #fff;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 10px 20px;
+
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+
+  z-index: 1000; /* para que quede por encima */
+
+}
+
+
+
+.navbar-logo img {
+
+  height: 40px;
+
+}
+
+
+
+.navbar-menu a {
+
+  margin-left: 16px;
+
+  text-decoration: none;
+
+  font-weight: bold;
+
+  color: #C82B1D;
+
+}
+
+
+
+.navbar-menu a:hover {
+
+  color: #9F0A1F;
+
+}
+
+
+
+/* ==========================
+
+   CARDS (para productos, compras, devoluciones)
+
+========================== */
+
+.card {
+
+  background: #fff;
+
+  padding: 16px;
+
+  border-radius: 10px;
+
+  margin: 12px 0;
+
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+
+}
+
+
+
+.card h3 {
+
+  margin: 0;
+
+  font-size: 18px;
+
+  color: #333;
+
+}
+
+
+
+.card p {
+
+  margin: 10px 0;
+
+  font-size: 14px;
+
+  color: #555;
+
+}
+
+
+
+/* ==========================
+
+   TABLAS (compras, devoluciones)
+
+========================== */
+
+table {
+
+  width: 100%;
+
+  border-collapse: collapse;
+
+  margin-top: 12px;
+
+}
+
+
+
+th, td {
+
+  padding: 10px;
+
+  border-bottom: 1px solid #ddd;
+
+}
+
+
+
+th {
+
+  background: #f8f8f8;
+
+  font-size: 15px;
+
+  color: #333;
+
+}
+
+
+
+tr:hover {
+
+  background: #f1f1f1;
+
+}
+
+
+
+/* ==========================
+
+   ALERTAS
+
+========================== */
+
+.error-message {
+
+  background: #ffefef;
+
+  color: #b00020;
+
+  padding: 10px;
+
+  border-radius: 6px;
+
+  margin-bottom: 10px;
+
+}
+
+
+
+.success-message {
+
+  background: #e9ffe9;
+
+  color: #0e7a0e;
+
+  padding: 10px;
+
+  border-radius: 6px;
+
+  margin-bottom: 10px;
+
+}
+
+
+
+/* ==========================
+
+   RESPONSIVE
+
+========================== */
+
+@media (max-width: 480px) {
+
+  .container { padding: 16px; border-radius: 6px; }
+
+  .logo img { width: 160px; }
+
+
+
+  .navbar {
+
+    flex-direction: column;
+
+    text-align: center;
+
+  }
+
+
+
+  .navbar-menu {
+
+    margin-top: 10px;
+
+  }
+
+}

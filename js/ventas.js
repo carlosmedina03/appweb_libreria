@@ -1,6 +1,6 @@
 // ============================================================
 // RESPONSABLE: Rol 2 (Front-End) - Lógica de Interacción
-// INTEGRACIÓN: El Rol 4 provee los endpoints en /ajax
+// INTEGRACIÓN: El Rol 4 provee los endpoints en /ajaxr
 // ============================================================
 
 // 1. Detectar evento 'submit' o 'change' del input código.

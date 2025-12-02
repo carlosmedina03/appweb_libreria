@@ -58,36 +58,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Sistema</title>
-    <style>
-        .error { color: red; font-weight: bold; }
-        body { font-family: sans-serif; padding: 20px; }
-    </style>
-</head>
-<body>
-    <h2>Iniciar Sesión</h2>
-    
-    <?php if(!empty($mensaje_error)): ?>
-        <p class="error"><?php echo $mensaje_error; ?></p>
-    <?php endif; ?>
-
-    <form action="" method="post">
-        <div>
-            <label>Usuario:</label><br>
-            <input type="text" id="user" name="user" required autofocus>
-        </div>
-        <div>
-            <label>Contraseña:</label><br>
-            <input type="password" id="pass" name="pass" required>
-        </div>
-        <br>
-        <button type="submit">Entrar</button>
-    </form>
-</body>
-</html>

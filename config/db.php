@@ -4,7 +4,7 @@
 
 $host = 'localhost';
 $user = 'root';     // Usuario por defecto de XAMPP
-$pass = '';         // Contraseña por defecto de XAMPP (vacía)
+$pass = '';     // Contraseña por defecto de XAMPP (vacía)
 $db   = 'libreria_db';
 
 $mysqli = new mysqli($host, $user, $pass, $db);
@@ -16,5 +16,4 @@ if ($mysqli->connect_error) {
     die("Error crítico de conexión: " . $mysqli->connect_error);
 }
 
-echo "Conexión Exitosa"
 ?>
