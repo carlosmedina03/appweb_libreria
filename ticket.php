@@ -17,26 +17,49 @@ session_start();
 
 if (!isset($_GET['folio'])) die("Folio no especificado");
 $folio = intval($_GET['folio']);
+$tipo = $_GET['tipo'] ?? 'venta'; // Por defecto es venta, puede ser 'devolucion'
 
 // 1. Datos del Negocio
 $sql_conf = "SELECT * FROM configuracion WHERE id = 1";
 $negocio = $mysqli->query($sql_conf)->fetch_assoc();
 
-// 2. Encabezado de Venta
-$sql_venta = "SELECT v.*, u.username as cajero 
-              FROM ventas v 
-              JOIN usuarios u ON v.id_usuario = u.id 
-              WHERE v.id = $folio";
-$venta = $mysqli->query($sql_venta)->fetch_assoc();
+$titulo_ticket = "TICKET DE VENTA";
 
-if (!$venta) die("Venta no encontrada");
+if ($tipo === 'devolucion') {
+    $titulo_ticket = "COMPROBANTE DE DEVOLUCIÓN";
+    // 2. Encabezado de Devolución
+    $sql_encabezado = "SELECT d.*, u.username as cajero, d.id_venta as folio_original
+                       FROM devoluciones d 
+                       JOIN usuarios u ON d.id_usuario = u.id 
+                       WHERE d.id = $folio";
+    $encabezado = $mysqli->query($sql_encabezado)->fetch_assoc();
 
-// 3. Detalles (Líneas)
-$sql_det = "SELECT dv.*, l.titulo 
-            FROM detalle_ventas dv 
-            JOIN libros l ON dv.id_libro = l.id 
-            WHERE dv.id_venta = $folio";
-$detalles = $mysqli->query($sql_det);
+    if (!$encabezado) die("Devolución no encontrada");
+
+    // 3. Detalles de Devolución
+    $sql_det = "SELECT dd.cantidad, dd.monto_reembolsado as importe, l.titulo, 0 as precio_unitario
+                FROM detalle_devoluciones dd
+                JOIN libros l ON dd.id_libro = l.id
+                WHERE dd.id_devolucion = $folio";
+    $detalles = $mysqli->query($sql_det);
+
+} else { // Es una venta normal
+    // 2. Encabezado de Venta
+    $sql_encabezado = "SELECT v.*, u.username as cajero 
+                  FROM ventas v 
+                  JOIN usuarios u ON v.id_usuario = u.id 
+                  WHERE v.id = $folio";
+    $encabezado = $mysqli->query($sql_encabezado)->fetch_assoc();
+
+    if (!$encabezado) die("Venta no encontrada");
+
+    // 3. Detalles de Venta
+    $sql_det = "SELECT dv.*, l.titulo 
+                FROM detalle_ventas dv 
+                JOIN libros l ON dv.id_libro = l.id 
+                WHERE dv.id_venta = $folio";
+    $detalles = $mysqli->query($sql_det);
+}
 
 // AHORA VIENE EL HTML DEL ROL 2 (UX)...
 //FRONTEND ABAJO
@@ -46,7 +69,7 @@ $detalles = $mysqli->query($sql_det);
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ticket de Venta #<?php echo $folio; ?></title>
+    <title><?php echo $titulo_ticket; ?> #<?php echo $folio; ?></title>
     <link rel="stylesheet" href="css/ticket.css">
   </head>
 
@@ -64,9 +87,12 @@ $detalles = $mysqli->query($sql_det);
       </div>
       
       <div style="font-size: 9pt;">
-        <p style="margin: 0;">**FOLIO DE VENTA:** <?php echo $venta['id']; ?></p>
-        <p style="margin: 0;">**FECHA:** <?php echo date('d/m/Y H:i', strtotime($venta['fecha_hora'])); ?></p>
-        <p style="margin: 0 0 5px 0;">**CAJERO:** <?php echo htmlspecialchars($venta['cajero']); ?></p>
+        <p style="margin: 0; font-weight: bold;"><?php echo $titulo_ticket; ?>: <?php echo $encabezado['id']; ?></p>
+        <?php if ($tipo === 'devolucion'): ?>
+            <p style="margin: 0;">SOBRE VENTA ORIGINAL: #<?php echo $encabezado['folio_original']; ?></p>
+        <?php endif; ?>
+        <p style="margin: 0;">FECHA: <?php echo date('d/m/Y H:i', strtotime($encabezado['fecha_hora'])); ?></p>
+        <p style="margin: 0 0 5px 0;">CAJERO: <?php echo htmlspecialchars($encabezado['cajero']); ?></p>
         <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
       </div>
 
@@ -100,9 +126,13 @@ $detalles = $mysqli->query($sql_det);
       <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
 
       <div style="font-size: 10pt; text-align: right;">
-        <p style="margin: 0;">**SUBTOTAL:** $<?php echo number_format($subtotal, 2); ?></p>
-        <p style="margin: 0;">**IVA (16%):** $<?php echo number_format($venta['iva'], 2); ?></p>
-        <h2 style="margin: 5px 0 10px 0; font-size: 14pt;">**TOTAL:** $<?php echo number_format($venta['total'], 2); ?></h2>
+        <?php if ($tipo === 'venta'): ?>
+            <p style="margin: 0;">**SUBTOTAL:** $<?php echo number_format($encabezado['subtotal'], 2); ?></p>
+            <p style="margin: 0;">**IVA (16%):** $<?php echo number_format($encabezado['iva'], 2); ?></p>
+            <h2 style="margin: 5px 0 10px 0; font-size: 14pt;">**TOTAL:** $<?php echo number_format($encabezado['total'], 2); ?></h2>
+        <?php else: ?>
+            <h2 style="margin: 5px 0 10px 0; font-size: 14pt;">**TOTAL REEMBOLSADO:** $<?php echo number_format($encabezado['total_reembolsado'], 2); ?></h2>
+        <?php endif; ?>
       </div>
 
       <div style="text-align: center; font-size: 8pt; margin-top: 10px;">
