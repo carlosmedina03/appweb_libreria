@@ -2,15 +2,34 @@
 REQUERIMIENTO: Configuración de impresión 80x40mm
 */
 @page {
-    size: 80mm 40mm; /* Ojo: el largo puede ser auto en impresoras continuas */
+    /* TAMAÑO Y MARGEN CERO PARA IMPRESORA TÉRMICA */
+    size: 80mm auto; /* El largo es 'auto' para rollo continuo */
     margin: 0;
 }
 body {
     margin: 0;
     font-family: monospace; /* Fuente monoespaciada obligatoria */
     color: black;
+    /* Ancho máximo del cuerpo para simular el rollo */
+    width: 80mm; 
+    padding: 5px; /* Pequeño padding interno para que no se pegue al borde */
 }
-/* Ocultar botones de impresión */
+
+/* ESTILOS DE LA TABLA */
+.ticket table {
+    width: 100%;
+}
+.ticket table th, .ticket table td {
+    padding: 0;
+    line-height: 1.2;
+}
+
+/* OCULTAR ELEMENTOS NO IMPRIMIBLES */
 @media print {
-    .no-print { display: none; }
+    .no-print { display: none !important; }
+}
+
+/* ESTILOS GENERALES DEL TICKET */
+.ticket {
+    padding: 0 2mm; /* Pequeño margen interno en los lados */
 }
