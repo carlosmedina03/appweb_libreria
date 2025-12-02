@@ -22,8 +22,8 @@ if (!isset($_SESSION['carrito'])) {
 }
 
 // Datos del cajero para mostrar en pantalla (opcional, pero útil para UX)
-//$cajero_nombre = $_SESSION['user']['nombre_completo'];
-//$cajero_id = $_SESSION['user']['id'];
+$cajero_nombre = $_SESSION['user']['nombre'];
+$cajero_id = $_SESSION['user']['id'];
 
 // AHORA VIENE EL HTML DEL ROL 2...
 // El resto de la lógica (buscar producto, agregar) se hace via AJAX con los archivos que ya te di.

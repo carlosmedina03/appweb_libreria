@@ -18,6 +18,14 @@ $fecha_ini = $_GET['inicio'] ?? date('Y-m-01 00:00:00');
 $fecha_fin = $_GET['fin'] ?? date('Y-m-t 23:59:59');
 $filtro_cajero = isset($_GET['cajero']) ? intval($_GET['cajero']) : 0;
 
+// BACKEND: Obtener lista de cajeros para el filtro
+$res_cajeros = $mysqli->query("SELECT id, nombre_completo FROM usuarios WHERE activo = 1 ORDER BY nombre_completo");
+$cajeros = [];
+while($row = $res_cajeros->fetch_assoc()) {
+    $cajeros[] = $row;
+}
+
+
 // 2. Query (Basado en Consultas Base 3.2)
 $sql = "SELECT v.id as folio, v.fecha_hora, u.nombre_completo as cajero, v.subtotal, v.iva, v.total 
         FROM ventas v 
@@ -55,14 +63,14 @@ $ticket_promedio = ($num_tickets > 0) ? ($suma_total_facturado / $num_tickets) :
             <div style="flex: 1;">
                 <label for="inicio">Fecha Inicio</label>
                 <input type="date" id="inicio" name="inicio" required 
-                       value="<?php echo htmlspecialchars($fecha_ini_display); ?>" 
+                       value="<?php echo date('Y-m-d', strtotime($fecha_ini)); ?>" 
                        style="width: 100%; padding: 8px;">
             </div>
             
             <div style="flex: 1;">
                 <label for="fin">Fecha Fin</label>
                 <input type="date" id="fin" name="fin" required 
-                       value="<?php echo htmlspecialchars($fecha_fin_display); ?>" 
+                       value="<?php echo date('Y-m-d', strtotime($fecha_fin)); ?>" 
                        style="width: 100%; padding: 8px;">
             </div>
 
