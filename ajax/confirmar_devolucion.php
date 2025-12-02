@@ -15,10 +15,6 @@ $mysqli->begin_transaction();
 try {
     $total_reembolso = 0;
 
-    // 1. Calcular total a reembolsar y validar cantidades
-    // (Aquí deberías hacer un query para verificar que no devuelva más de lo que compró,
-    // por brevedad asumimos que el Front validó, pero el Back siempre debe desconfiar).
-    
     // Insertar Encabezado Devolución
     $sql_dev = "INSERT INTO devoluciones (id_venta, id_usuario, total_reembolsado, motivo, fecha_hora) VALUES (?, ?, 0, ?, NOW())";
     $stmt = $mysqli->prepare($sql_dev);
@@ -33,16 +29,26 @@ try {
     $stmt_stk = $mysqli->prepare($sql_stock);
 
     foreach ($items_dev as $item) {
-        // Obtener precio original de venta para calcular reembolso
-        $q_precio = "SELECT precio_unitario FROM detalle_ventas WHERE id_venta = ? AND id_libro = ?";
+        // 1. VALIDACIÓN CRÍTICA: Verificar que no se devuelva más de lo vendido.
+        // Y obtener el precio original de venta para calcular reembolso.
+        $q_precio = "SELECT cantidad, precio_unitario FROM detalle_ventas WHERE id_venta = ? AND id_libro = ?";
         $stmt_p = $mysqli->prepare($q_precio);
         $stmt_p->bind_param("ii", $id_venta, $item['id_libro']);
         $stmt_p->execute();
-        $stmt_p->bind_result($precio_vendido);
-        $stmt_p->fetch();
+        $stmt_p->bind_result($cantidad_vendida, $precio_vendido);
+        $result = $stmt_p->fetch();
         $stmt_p->close();
 
-        $monto_linea = $item['cantidad'] * $precio_vendido;
+        if (!$result) {
+            throw new Exception("El producto con ID " . $item['id_libro'] . " no pertenece a la venta original.");
+        }
+
+        if ($item['cantidad'] > $cantidad_vendida) {
+            throw new Exception("Intento de devolver " . $item['cantidad'] . " unidades, pero solo se vendieron " . $cantidad_vendida . ".");
+        }
+
+        // 2. Calcular monto y sumar al total
+        $monto_linea = $item['cantidad'] * floatval($precio_vendido);
         $total_reembolso += $monto_linea;
 
         // Registrar detalle
@@ -54,7 +60,11 @@ try {
         $stmt_stk->execute();
     }
 
-    // Actualizar el total del encabezado
+    // Si no hay items, no tiene sentido la devolución
+    if (empty($items_dev)) {
+        throw new Exception("No se seleccionaron productos para devolver.");
+    }
+
     $mysqli->query("UPDATE devoluciones SET total_reembolsado = $total_reembolso WHERE id = $id_devolucion");
 
     $mysqli->commit();
