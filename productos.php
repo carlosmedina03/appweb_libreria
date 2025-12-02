@@ -157,7 +157,7 @@ $productos = $mysqli->query("SELECT * FROM libros WHERE estatus = 1");
                 <tbody>
                     <?php foreach ($productos as $producto): ?>
                     <tr class="<?php echo ($producto['cantidad'] ?? 0) <= 5 ? 'error-row' : ''; ?>">
-                        <td><img src="includes/mostrar_imagen.php?id=<?php echo $producto['id']; ?>" alt="Portada" style="width: 50px; height: 70px; object-fit: cover; border-radius: 4px;"></td>
+                        <td><img src="img.php?tipo=producto&id=<?php echo $producto['id']; ?>" alt="Portada" style="width: 50px; height: 70px; object-fit: cover; border-radius: 4px;"></td>
                         <td><?php echo htmlspecialchars($producto['codigo']); ?></td>
                         <td><?php echo htmlspecialchars($producto['titulo']); ?></td>
                         <td>$<?php echo number_format($producto['precio_venta'], 2); ?></td>

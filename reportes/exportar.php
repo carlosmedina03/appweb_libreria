@@ -39,6 +39,29 @@ switch ($tipo) {
         $res = $mysqli->query($sql);
         while ($row = $res->fetch_assoc()) fputcsv($output, $row);
         break;
+
+    case 'compras':
+        fputcsv($output, ['Folio', 'Fecha', 'Proveedor', 'Total']);
+        $sql = "SELECT c.id, c.fecha_hora, p.nombre, c.total_compra 
+                FROM compras c 
+                JOIN proveedores p ON c.id_proveedor = p.id 
+                ORDER BY c.fecha_hora DESC";
+        $res = $mysqli->query($sql);
+        while ($row = $res->fetch_assoc()) fputcsv($output, $row);
+        break;
+
+    case 'devoluciones':
+        fputcsv($output, ['Fecha', 'Folio Venta Original', 'Codigo Producto', 'Nombre Producto', 'Cantidad Devuelta', 'Importe Ajustado', 'Motivo']);
+        $sql = "SELECT d.fecha_hora, d.id_venta, l.codigo, l.titulo,
+                       dd.cantidad, dd.monto_reembolsado, d.motivo
+                FROM devoluciones d
+                JOIN detalle_devoluciones dd ON d.id = dd.id_devolucion
+                JOIN libros l ON dd.id_libro = l.id
+                ORDER BY d.fecha_hora DESC";
+        $res = $mysqli->query($sql);
+        while ($row = $res->fetch_assoc()) fputcsv($output, $row);
+        break;
+
 }
 
 fclose($output);
