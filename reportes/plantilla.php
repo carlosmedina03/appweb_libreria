@@ -8,7 +8,6 @@
 // - Footer: "Página X de Y", Usuario que generó.
 $usuario_gen = 'Administrador'; // Placeholder for static version
 ?>
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -60,6 +59,6 @@ $usuario_gen = 'Administrador'; // Placeholder for static version
             <p style="margin: 0;">Página 1 de 1</p> 
         </div>
 
-    </div> <!-- Cierra el .container -->
+    </div>
 </body>
 </html>

@@ -1,3 +1,30 @@
+<?php
+// ============================================================
+// RESPONSABLE: Rol 4 (Lógica) y Rol 2 (UI)d
+// REQUERIMIENTO: "Compras... Capturan encabezado... y detalle (producto, cantidad, costo)"
+// ============================================================
+require_once 'includes/security_guard.php'; // Guard: Solo Admins
+require_once 'config/db.php';
+
+// TODO:
+// 1. Tabla dinámica (JS) para agregar productos al listado de compra.
+// 2. Botón "Guardar Compra" -> ajax/confirmar_compra.php.
+
+// BACKEND ACA (NO BORRAR)
+// REQUERIMIENTO: "Compras. Capturan encabezado (fecha, proveedor...)"
+
+// Obtener lista de proveedores para el <select> del HTML
+// El de UX usará la variable $proveedores en un foreach
+$sql_prov = "SELECT id, nombre FROM proveedores WHERE estatus = 1 ORDER BY nombre";
+$res_prov = $mysqli->query($sql_prov);
+$proveedores = [];
+while ($row = $res_prov->fetch_assoc()) {
+    $proveedores[] = $row;
+}
+
+// AHORA VIENE EL HTML DEL ROL 2...
+// Nota para UX: Usar foreach($proveedores as $p) para llenar el <select name="proveedor">
+?>
 <!doctype html>
 <html lang="es">
   <head>
@@ -15,17 +42,17 @@
       </div>
       <div class="navbar-menu">
         <a href="ventas.php">Punto de ventas</a>
-        <a href="productos.php">Productos</a>
         <a href="compras.php">Compras</a>
         <a href="devoluciones.php">Devoluciones</a>
+        <?php if ($rol === 'admin'): ?>
         <a href="usuarios.php">Usuario</a>
-
+        <a href="productos.php">Productos</a>
         <a href="reportes/compras.php">Reportes compra</a>
         <a href="reportes/devoluciones.php">Reportes devoluciones</a>
         <a href="reportes/inventario.php">Reportes inventario</a>
         <a href="reportes/ventas_detalle.php">Reportes detalle</a>
         <a href="reportes/ventas_encabezado.php">Reportes encabezado</a>
-
+        <?php endif; ?>
         <a href="index.php">Salir</a>
       </div>
     
