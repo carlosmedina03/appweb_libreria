@@ -3,11 +3,11 @@
 // ==========================================
 
 $host = 'localhost';
-$host = 'localhost:3307';
+$host = 'localhost:3306';
 $user = 'root';     // Usuario por defecto de XAMPP
 $pass = '';     // Contraseña por defecto de XAMPP (vacía)
 $db   = 'libreria_db';
-$port = 3307;
+$port = 3306;
 
 $mysqli = new mysqli($host, $user, $pass, $db);
 

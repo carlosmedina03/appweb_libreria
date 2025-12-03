@@ -11,7 +11,7 @@
 // REQUERIMIENTO: "Filtros obligatorios: q (código/nombre), solo activos"
 // ---------------------------------------------------------
 require_once '../config/db.php';
-require_once '../includes/auth.php'; // Protegido
+require_once '../includes/security_guard.php';
 
 // 1. Recibir Filtros
 $filtro_q = isset($_GET['q']) ? $mysqli->real_escape_string($_GET['q']) : '';

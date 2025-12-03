@@ -11,7 +11,7 @@
 // REQUERIMIENTO: "Totales al final: Importe facturado, Número tickets, Promedio"
 // ---------------------------------------------------------
 require_once '../config/db.php';
-require_once '../includes/auth.php';
+require_once '../includes/security_guard.php';
 
 // 1. Fechas por defecto (Mes actual si no envían nada)
 $fecha_ini = $_GET['inicio'] ?? date('Y-m-01 00:00:00');

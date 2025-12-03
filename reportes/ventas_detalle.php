@@ -10,7 +10,7 @@
 // REQUERIMIENTO: "3.3 Detalle de ventas... Columnas: ..., Importe línea"
 // ---------------------------------------------------------
 require_once '../config/db.php';
-require_once '../includes/auth.php';
+require_once '../includes/security_guard.php';
 
 $fecha_ini = $_GET['inicio'] ?? date('Y-m-01 00:00:00');
 $fecha_fin = $_GET['fin'] ?? date('Y-m-t 23:59:59');

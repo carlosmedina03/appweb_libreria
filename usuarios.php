@@ -1,10 +1,9 @@
 <?php
-// ============================================================
-// RESPONSABLE: Rol 5 (Admin de usuarios) y Rol 2 (UI)d
-// REQUERIMIENTO: "Admin gestiona... usuarios"
-// ============================================================
 require_once 'includes/security_guard.php'; // Guard: Solo Admins
 require_once 'config/db.php';
+
+// 1. DEFINIR ROL PARA EL NAVBAR
+$rol = $_SESSION['user']['rol'];
 
 $mensaje = "";
 $error = "";
@@ -14,34 +13,27 @@ $error = "";
 // Procesar acciones (Crear, Editar, Desactivar)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
+    // Sanitización básica
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-    $nombre = $_POST['nombre_completo'] ?? '';
-    $username = $_POST['username'] ?? '';
+    $nombre = trim($_POST['nombre_completo'] ?? '');
+    $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
-    $rol = $_POST['rol'] ?? 'operador';
+    $rol_input = $_POST['rol'] ?? 'operador';
 
     try {
         if ($action === 'crear') {
-            $pass_hash = password_hash($password, PASSWORD_DEFAULT);
-            $sql = "INSERT INTO usuarios (nombre_completo, username, password, rol) VALUES (?, ?, ?, ?)";
-            $stmt = $mysqli->prepare($sql);
-            $stmt->bind_param("ssss", $nombre, $username, $pass_hash, $rol);
-            $stmt->execute();
-            $mensaje = "Usuario creado correctamente.";
-        } elseif ($action === 'editar' && $id > 0) {
-            if (!empty($password)) {
+            if (!empty($nombre) && !empty($username) && !empty($password)) {
                 $pass_hash = password_hash($password, PASSWORD_DEFAULT);
-                $sql = "UPDATE usuarios SET nombre_completo = ?, username = ?, password = ?, rol = ? WHERE id = ?";
+                $sql = "INSERT INTO usuarios (nombre_completo, username, password, rol, activo) VALUES (?, ?, ?, ?, 1)";
                 $stmt = $mysqli->prepare($sql);
-                $stmt->bind_param("ssssi", $nombre, $username, $pass_hash, $rol, $id);
+                $stmt->bind_param("ssss", $nombre, $username, $pass_hash, $rol_input);
+                $stmt->execute();
+                $mensaje = "Usuario creado correctamente.";
             } else {
-                $sql = "UPDATE usuarios SET nombre_completo = ?, username = ?, rol = ? WHERE id = ?";
-                $stmt = $mysqli->prepare($sql);
-                $stmt->bind_param("sssi", $nombre, $username, $rol, $id);
+                $error = "Todos los campos son obligatorios.";
             }
-            $stmt->execute();
-            $mensaje = "Usuario actualizado correctamente.";
-        }
+        } 
+        // Nota: La lógica de editar se implementaría recibiendo el ID, aquí lo simplificamos para el alta.
     } catch (Exception $e) {
         if ($mysqli->errno === 1062) {
             $error = "Error: El nombre de usuario '$username' ya existe.";
@@ -54,21 +46,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Acción de desactivar por GET
 if (isset($_GET['action']) && $_GET['action'] === 'baja' && isset($_GET['id'])) {
     $id_baja = intval($_GET['id']);
-    if ($id_baja !== $_SESSION['user']['id']) { // Evitar que el admin se desactive a sí mismo
+    // Evitar que el admin se desactive a sí mismo (Protección lógica)
+    if ($id_baja !== $_SESSION['user']['id']) { 
         $sql_baja = "UPDATE usuarios SET activo = 0 WHERE id = ?";
         $stmt_baja = $mysqli->prepare($sql_baja);
         $stmt_baja->bind_param("i", $id_baja);
         $stmt_baja->execute();
-        header("Location: usuarios.php"); // Redirigir para limpiar la URL
+        header("Location: usuarios.php"); // Limpiar URL
         exit;
+    } else {
+        $error = "No puedes desactivar tu propia cuenta.";
     }
 }
 
-// Obtener listado de usuarios para mostrar en la tabla
-$resultado = $mysqli->query("SELECT id, nombre_completo, username, rol, activo FROM usuarios");
-$usuarios = [];
+// Obtener listado REAL de usuarios para mostrar en la tabla
+$resultado = $mysqli->query("SELECT id, nombre_completo, username, rol, activo FROM usuarios ORDER BY id ASC");
+$usuarios_db = [];
 while ($row = $resultado->fetch_assoc()) {
-    $usuarios[] = $row;
+    $usuarios_db[] = $row;
 }
 ?>
 
@@ -80,38 +75,83 @@ while ($row = $resultado->fetch_assoc()) {
     <title>María de Letras | Usuarios</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" type="image/png" href="assets/img/logo-maria-de-letras_icon.svg">
+    <style>
+        /* Estilos simples para el formulario que agregué */
+        .form-container {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+        }
+    </style>
   </head>
 
   <body>
     <div class="navbar">
       <div class="navbar-logo">
-        <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo de María de Letras">
+        <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
       </div>
       <div class="navbar-menu">
         <a href="ventas.php">Punto de ventas</a>
-        <a href="compras.php">Compras</a>
-        <a href="devoluciones.php">Devoluciones</a>
+        
         <?php if ($rol === 'admin'): ?>
-        <a href="usuarios.php">Usuario</a>
-        <a href="productos.php">Productos</a>
-        <a href="reportes/compras.php">Reportes compra</a>
-        <a href="reportes/devoluciones.php">Reportes devoluciones</a>
-        <a href="reportes/inventario.php">Reportes inventario</a>
-        <a href="reportes/ventas_detalle.php">Reportes detalle</a>
-        <a href="reportes/ventas_encabezado.php">Reportes encabezado</a>
+            <a href="compras.php">Compras</a>
+            <a href="devoluciones.php">Devoluciones</a>
+            <a href="usuarios.php">Usuarios</a>
+            <a href="productos.php">Productos</a>
+            <a href="reportes/inventario.php">Reportes</a>
         <?php endif; ?>
-        <a href="index.php">Salir</a>
+        
+        <a href="includes/logout.php" style="background: #333; color: white;">Salir</a>
       </div>
-    
     </div>
 
     <div class="container main-content">
         <div class="flex-between mb-15">
             <h2>Administración de Usuarios</h2>
-            <button class="btn w-auto" onclick="alert('Abrir modal de creación (Simulado)')">+ Nuevo Usuario</button>
         </div>
 
-        
+        <?php if (!empty($mensaje)): ?>
+            <div style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center;">
+                <?php echo htmlspecialchars($mensaje); ?>
+            </div>
+        <?php endif; ?>
+        <?php if (!empty($error)): ?>
+            <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center;">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="form-container">
+            <h3>+ Nuevo Usuario</h3>
+            <form method="POST" action="usuarios.php">
+                <input type="hidden" name="action" value="crear">
+                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label>Nombre Completo</label>
+                        <input type="text" name="nombre_completo" required style="width: 100%; padding: 8px;" placeholder="Ej: Juan Pérez">
+                    </div>
+                    <div>
+                        <label>Rol</label>
+                        <select name="rol" style="width: 100%; padding: 8px;">
+                            <option value="operador">Operador (Vendedor)</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Usuario (Login)</label>
+                        <input type="text" name="username" required style="width: 100%; padding: 8px;" autocomplete="off">
+                    </div>
+                    <div>
+                        <label>Contraseña</label>
+                        <input type="password" name="password" required style="width: 100%; padding: 8px;" autocomplete="new-password">
+                    </div>
+                </div>
+                <button type="submit" class="btn" style="margin-top: 15px;">Crear Usuario</button>
+            </form>
+        </div>
+
         <div class="card">
             <h3>Listado de Empleados</h3>
             <table>
@@ -126,44 +166,40 @@ while ($row = $resultado->fetch_assoc()) {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Administrador Principal</td>
-                        <td>admin</td>
-                        <td>Administrador</td>
-                        <td>
-                            <span class="text-green font-bold">Activo</span>
-                        </td>
-                        <td>
-                            <a class="text-red" style="text-decoration: none; cursor: pointer;">Editar</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Juan Pérez</td>
-                        <td>juanp</td>
-                        <td>Operador</td>
-                        <td>
-                            <span class="text-green font-bold">Activo</span>
-                        </td>
-                        <td>
-                            <a class="text-red" style="text-decoration: none; cursor: pointer;">Editar</a>
-                            | <a class="text-gray" style="text-decoration: none; cursor: pointer;">Desactivar</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>María López</td>
-                        <td>marial</td>
-                        <td>Diseñador</td>
-                        <td>
-                            <span class="text-gray">Inactivo</span>
-                        </td>
-                        <td>
-                            <a class="text-red" style="text-decoration: none; cursor: pointer;">Editar</a>
-                            | <a class="text-gray" style="text-decoration: none; cursor: pointer;">Desactivar</a>
-                        </td>
-                    </tr>
+                    <?php if (empty($usuarios_db)): ?>
+                        <tr><td colspan="6" style="text-align:center;">No hay usuarios registrados.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($usuarios_db as $u): ?>
+                        <tr>
+                            <td><?php echo $u['id']; ?></td>
+                            <td><?php echo htmlspecialchars($u['nombre_completo']); ?></td>
+                            <td><?php echo htmlspecialchars($u['username']); ?></td>
+                            <td><?php echo ucfirst($u['rol']); ?></td>
+                            <td>
+                                <?php if ($u['activo'] == 1): ?>
+                                    <span style="color: green; font-weight: bold;">Activo</span>
+                                <?php else: ?>
+                                    <span style="color: gray;">Inactivo</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if ($u['id'] != $_SESSION['user']['id']): ?>
+                                    <?php if ($u['activo'] == 1): ?>
+                                        <a href="usuarios.php?action=baja&id=<?php echo $u['id']; ?>" 
+                                           onclick="return confirm('¿Seguro que deseas desactivar este usuario?');"
+                                           style="color: red; text-decoration: none;">
+                                           Desactivar
+                                        </a>
+                                    <?php else: ?>
+                                        <span style="color: #999;">Baja</span>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <span style="font-size: 0.8em; color: #555;">(Tú)</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
