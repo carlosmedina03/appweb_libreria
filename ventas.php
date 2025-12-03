@@ -1,32 +1,20 @@
 <?php
-// ============================================================
-// RESPONSABLE: Rol 4 (Lógica) y Rol 2 (UI)d
-// REQUERIMIENTO: "Ventas... captura por código o buscador... retorno automático"
-// ============================================================
-require_once 'includes/auth.php'; // Guard: Solo operadores y admins
+// ventas.php
 
-// TODO:
-// 1. Input autofocus para el lector de código de barras.
-// 2. Tabla visual del "Carrito de compras" actual (desde $_SESSION).
-// 3. Botón "Confirmar Venta" -> llama a ajax/confirmar_venta.php.
-// 4. Al terminar, abrir ticket.php en ventana nueva (window.open).
+// 1. SEGURIDAD
+// Usamos security_guard.php para validar que exista sesión.
+// Permite acceso a Admin y Operador.
+require_once 'includes/seguridad_basica.php';
 
-// BACKEND ABAJO (NO BORRAR)
-// REQUERIMIENTO: "Ventas... cajero (desde sesión)"
-require_once 'includes/auth.php'; 
-// Nota: No restringimos rol porque Admin y Operador pueden vender.
+// 2. VARIABLES DE SESIÓN
+$rol = $_SESSION['user']['rol'];
+$cajero_nombre = $_SESSION['user']['nombre'];
+$cajero_id = $_SESSION['user']['id'];
 
 // Inicializar carrito vacío si es la primera vez que entra
 if (!isset($_SESSION['carrito'])) {
     $_SESSION['carrito'] = [];
 }
-
-// Datos del cajero para mostrar en pantalla (opcional, pero útil para UX)
-$cajero_nombre = $_SESSION['user']['nombre'];
-$cajero_id = $_SESSION['user']['id'];
-
-// AHORA VIENE EL HTML DEL ROL 2...
-// El resto de la lógica (buscar producto, agregar) se hace via AJAX con los archivos que ya te di.
 ?>
 
 <!doctype html>
@@ -46,35 +34,33 @@ $cajero_id = $_SESSION['user']['id'];
       </div>
       <div class="navbar-menu">
         <a href="ventas.php">Punto de ventas</a>
-        <a href="productos.php">Productos</a>
-        <a href="compras.php">Compras</a>
-        <a href="devoluciones.php">Devoluciones</a>
-        <a href="usuarios.php">Usuario</a>
-
-        <a href="reportes/compras.php">Reportes compra</a>
-        <a href="reportes/devoluciones.php">Reportes devoluciones</a>
-        <a href="reportes/inventario.php">Reportes inventario</a>
-        <a href="reportes/ventas_detalle.php">Reportes detalle</a>
-        <a href="reportes/ventas_encabezado.php">Reportes encabezado</a>
-
-        <a href="includes/logout.php">Salir</a>
+        
+        <?php if ($rol === 'admin'): ?>
+            <a href="compras.php">Compras</a>
+            <a href="devoluciones.php">Devoluciones</a>
+            <a href="usuarios.php">Usuarios</a>
+            <a href="productos.php">Productos</a>
+            <a href="reportes/inventario.php">Reportes</a>
+        <?php else: ?>
+            <a href="devoluciones.php">Devoluciones</a>
+        <?php endif; ?>
+        
+        <a href="includes/logout.php" style="background: #333; color: white;">Salir</a>
       </div>
-    
     </div>
 
-
-    <div class="container" style="max-width: 1000px; margin-top: 20px;">
+    <div class="container main-content">
       <h2>Punto de Venta</h2>
-      <p style="font-size: 14px; color: #555;">Atendido por: **<?php echo htmlspecialchars($cajero_nombre); ?>**</p>
+      <p class="text-sm text-gray">Atendido por: <strong><?php echo htmlspecialchars($cajero_nombre); ?></strong></p>
       
-      <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+      <div class="flex-row mb-20">
         <input type="text" 
           id="codigo" 
           name="codigo"
           placeholder="Escanear código de barras o ingresar manual..." 
           autofocus
-          style="flex-grow: 1; width: auto;">
-        <button class="btn" style="width: 150px;">Buscar</button> 
+          class="flex-grow w-auto">
+        <button id="btn-buscar" class="btn w-150">Buscar</button> 
       </div>
 
       <div class="card">
@@ -83,22 +69,24 @@ $cajero_id = $_SESSION['user']['id'];
           <thead>
             <tr>
               <th>Producto</th>
-              <th style="width: 10%;">Cant.</th>
-              <th style="width: 15%;">Precio Unit.</th>
-              <th style="width: 15%;">Subtotal</th>
+              <th class="col-10">Cant.</th>
+              <th class="col-15">Precio Unit.</th>
+              <th class="col-15">Subtotal</th>
             </tr>
           </thead>
           <tbody id="tabla-carrito">
-            <tr><td colspan="4" style="text-align: center;">Escanea un producto para empezar.</td></tr>
+            <tr>
+                <td colspan="4" style="text-align: center; color: #777;">Escanea un producto para comenzar...</td>
+            </tr>
           </tbody>
         </table>
       </div>
 
-      <div style="text-align: right; font-size: 24px; font-weight: bold; color: #C82B1D; margin-top: 20px;">
+      <div class="text-right text-2xl font-bold text-red mt-20">
         Total: <span id="total-display">$0.00</span>
       </div>
 
-      <button id="btn-cobrar" class="btn" style="margin-top: 15px;">
+      <button id="btn-cobrar" class="btn mt-15">
         Confirmar Venta y Cobrar
       </button>
 

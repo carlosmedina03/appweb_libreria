@@ -1,6 +1,6 @@
 // ============================================================
 // RESPONSABLE: Rol 2 (Front-End) - Lógica de Interacción
-// INTEGRACIÓN: El Rol 4 provee los endpoints en /ajaxr
+// INTEGRACIÓN: El Rol 4 provee los endpoints en /ajax
 // ============================================================
 
 // 1. Detectar evento 'submit' o 'change' del input código.
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.key === "Enter") {
             e.preventDefault();
             const codigo = inputCodigo.value.trim();
-            if(codigo) {
+            if (codigo) {
                 buscarProducto(codigo);
             }
         }
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         // Actualizar total visual (con IVA o sin IVA según lógica visual)
-        if(totalDisplay) totalDisplay.innerText = `$${total.toFixed(2)}`;
+        if (totalDisplay) totalDisplay.innerText = `$${total.toFixed(2)}`;
     }
 
     // 5. Confirmar Venta

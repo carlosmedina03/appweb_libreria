@@ -7,7 +7,7 @@
 // 2. Obtener datos del negocio, cajero, líneas y totales.
 // 3. Renderizar HTML específico para impresora térmica.
 // 4. CSS debe estar en /css/ticket.css (@page size: 80mm 40mm).
-// 5. NO incluir encabezados/pies del navegador.
+// 5. NO incluir encabezados/pies del navegador.f
 
 //BACKEND (NO BORRAR)
 // REQUERIMIENTO: "Datos obligatorios a suministrar por el backend... Logo, Datos negocio, Folio..."

@@ -1,12 +1,13 @@
 <?php
-// ============================================================
-// RESPONSABLE: Rol 5 (Autenticación) y Rol 2 (UX-UI)
-// REQUERIMIENTO: "El acceso exige inicio de sesión (usuario/contraseña)."
-// ============================================================
-// TODO:
-// 1. Formulario HTML con inputs para 'username' y 'password'.
-// 2. Enviar datos via POST.
-// 3. Validar con password_verify (ver /database/seed.sql).
+// index.php
+session_start(); // NECESARIO: Iniciar sesión para recibir mensajes de error de auth.php
+
+// Verificar si hay algún mensaje de error guardado (ej: "Contraseña incorrecta")
+$error = '';
+if (isset($_SESSION['error_mensaje'])) {
+    $error = $_SESSION['error_mensaje'];
+    unset($_SESSION['error_mensaje']); // Borramos el mensaje para que no salga al recargar
+}
 ?>
 
 <!doctype html>
@@ -17,23 +18,23 @@
     <title>María de Letras | Iniciar sesión</title>
     <link rel="stylesheet" href="css/styles.css"> 
     <link rel="icon" type="image/png" href="assets/img/logo-maria-de-letras_icon.svg">
-
   </head>
 
   <body>
     <div class="container" style="max-width: 400px; margin-top: 80px;">
       <div class="logo" style="text-align: center;">
         <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo de María de Letras" style="margin-bottom: 5px;">
-        <h2 >Iniciar Sesión</h2>
+        <h2>Iniciar Sesión</h2>
       </div>
 
       <?php if (!empty($error)): ?>
-        <div class="error-message" style="margin-bottom: 15px; padding: 10px; border: 1px solid #C82B1D; background-color: #fdd; color: #C82B1D; border-radius: 4px;">
+        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border: 1px solid #f5c6cb; border-radius: 5px; text-align: center;">
             <?php echo htmlspecialchars($error); ?>
         </div>
       <?php endif; ?>
 
       <form method="POST" action="includes/auth.php" novalidate>
+        
         <div style="margin-bottom: 15px;">
           <label for="user">Usuario</label><br>
           <input type="text" 
@@ -41,8 +42,8 @@
             name="user" 
             required 
             autocomplete="username"
-            placeholder="Ingresa tu usuario">
-        </div>
+            placeholder="Ingresa tu usuario"
+            style="width: 100%; padding: 8px;"> </div>
 
         <div style="margin-bottom: 15px;">
           <label for="pass">Contraseña</label><br>
@@ -52,10 +53,11 @@
             name="pass" 
             required 
             autocomplete="current-password"
-            placeholder="Ingresa tu contraseña">
+            placeholder="Ingresa tu contraseña"
+            style="width: 100%; padding: 8px;">
         </div>
 
-        <button type="submit" class="btn" style="width: 100%;">
+        <button type="submit" class="btn" style="width: 100%; padding: 10px;">
           Ingresar
         </button>
       </form>

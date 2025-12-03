@@ -11,7 +11,7 @@
 // REQUERIMIENTO: "Filtros obligatorios: q (código/nombre), solo activos"
 // ---------------------------------------------------------
 require_once '../config/db.php';
-require_once '../includes/auth.php'; // Protegido
+require_once '../includes/security_guard.php';
 
 // 1. Recibir Filtros
 $filtro_q = isset($_GET['q']) ? $mysqli->real_escape_string($_GET['q']) : '';
@@ -47,30 +47,34 @@ $total_items = count($productos);
 
 // AHORA EL ROL 2 (UX) USARÁ $productos, $total_items y $total_existencias EN EL HTML   
 ?>
-<div class="card filtros-print" style="margin-bottom: 20px;">
-    <h3 style="margin-bottom: 10px;">Filtros de Inventario</h3>
-    <form action="" method="GET"> 
-        <div style="display: flex; gap: 20px; align-items: flex-end;">
+<?php
+$titulo_reporte = "REPORTE DE INVENTARIO ACTUAL";
+ob_start();
+?>
+
+<div class="card filtros-print mb-20">
+    <h3 class="mb-15">Filtros de Inventario</h3>
+    <form action="" method="GET">
+        <div class="filters-container">
             
-            <div style="flex: 2;">
-                <label for="q">Buscar (Código / Nombre)</label>
-                <input type="text" id="q" name="q" placeholder="Ej: LIB001 o Cien Años"
-                       value="<?php echo htmlspecialchars($filtro_q); ?>" 
-                       style="width: 100%; padding: 8px;">
+            <div class="filter-group-large">
+                <label for="busqueda">Buscar Producto</label>
+                <input type="text" id="busqueda" name="busqueda" placeholder="Código o Título..." class="filter-input">
+            </div>
+
+            <div class="filter-group">
+                <label for="stock">Estado de Stock</label>
+                <select id="stock" name="stock" class="filter-input">
+                    <option value="todos">Todos</option>
+                    <option value="bajo">Stock Bajo</option>
+                    <option value="agotado">Agotado</option>
+                </select>
             </div>
             
-            <div style="flex: 1; display: flex; align-items: center; padding-bottom: 5px;">
-                <input type="checkbox" id="activos" name="activos" 
-                       <?php echo $solo_activos ? 'checked' : ''; ?>
-                       style="margin-right: 5px;">
-                <label for="activos">Solo Activos</label>
-            </div>
-            
-            <button type="submit" style="width: 150px; padding: 10px;">
-                Aplicar Filtro
+            <button type="button" class="btn w-150">
+                Filtrar
             </button>
-            
-            <button type="button" class="btn-secondary" onclick="window.print()" style="width: 150px; padding: 10px;">
+            <button type="button" class="btn-secondary w-150" onclick="window.print()">
                 Imprimir / PDF
             </button>
         </div>
@@ -78,49 +82,57 @@ $total_items = count($productos);
 </div>
 
 <div class="card">
-    <p style="font-size: 0.9em; font-weight: bold;">
-        Total de Productos Encontrados: <?php echo $total_items; ?>
+    <p class="font-bold text-sm">
+        Total de Productos: 3
     </p>
     
     <table>
         <thead>
-            <tr style="background: #3498db; color: white;">
-                <th style="width: 120px;">Código</th>
-                <th>Nombre del Producto</th>
-                <th style="width: 100px; text-align: right;">Precio Venta</th>
-                <th style="width: 100px; text-align: right;">Existencia</th>
-                <th style="width: 80px;">Estado</th>
+            <tr class="bg-green"> 
+                <th class="w-150">Código</th>
+                <th>Título del Libro</th>
+                <th class="w-120 text-right">Precio Venta</th>
+                <th class="w-100 text-center">Stock Actual</th>
+                <th class="w-150 text-center">Valor Inventario</th>
             </tr>
         </thead>
         <tbody>
-            <?php if ($total_items > 0): ?>
-                <?php foreach ($productos as $p): ?>
-                    <tr> 
-                        <td><?php echo htmlspecialchars($p['codigo']); ?></td>
-                        <td><?php echo htmlspecialchars($p['nombre']); ?></td>
-                        <td style="text-align: right;">$<?php echo number_format($p['precio'], 2); ?></td>
-                        <td style="text-align: right; font-weight: bold;"><?php echo number_format($p['existencia'], 0); ?></td>
-                        <td><?php echo htmlspecialchars($p['estado_str']); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="5" style="text-align: center;">No se encontraron productos con los filtros seleccionados.</td></tr>
-            <?php endif; ?>
+            <tr> 
+                <td>LIB001</td>
+                <td>Cien Años de Soledad</td>
+                <td class="text-right">$250.00</td>
+                <td class="text-center">15</td>
+                <td class="text-right">$3,750.00</td>
+            </tr>
+            <tr> 
+                <td>LIB002</td>
+                <td>El Principito</td>
+                <td class="text-right">$150.00</td>
+                <td class="text-center font-bold text-danger">3 (Bajo)</td>
+                <td class="text-right">$450.00</td>
+            </tr>
+            <tr> 
+                <td>LIB003</td>
+                <td>Rayuela</td>
+                <td class="text-right">$200.00</td>
+                <td class="text-center">8</td>
+                <td class="text-right">$1,600.00</td>
+            </tr>
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="3" style="text-align: right; font-weight: bold; background: #f0f0f0;">
-                    TOTAL UNIDADES EN EXISTENCIA
+                <td colspan="4" class="text-right font-bold bg-light-green">
+                    VALOR TOTAL DEL INVENTARIO
                 </td>
-                <td style="font-weight: bold; background: #f0f0f0; text-align: right;">
-                    <?php echo number_format($total_existencias, 0); ?>
+                <td class="text-right font-bold bg-light-green">
+                    $5,800.00
                 </td>
-                <td style="background: #f0f0f0;"></td> </tr>
+            </tr>
         </tfoot>
     </table>
 </div>
 
 <?php
-$contenido_reporte = ob_get_clean(); // Guarda el buffer en la variable
-require_once 'plantilla.php'; // Asume que plantilla.php generará el HTML final
+$contenido_reporte = ob_get_clean();
+require_once 'plantilla.php';
 ?>
