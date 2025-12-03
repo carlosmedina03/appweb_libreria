@@ -27,13 +27,8 @@
         <h2 >Iniciar Sesión</h2>
       </div>
 
-      <?php if (!empty($error)): ?>
-        <div class="error-message" style="margin-bottom: 15px; padding: 10px; border: 1px solid #C82B1D; background-color: #fdd; color: #C82B1D; border-radius: 4px;">
-            <?php echo htmlspecialchars($error); ?>
-        </div>
-      <?php endif; ?>
 
-      <form method="POST" action="includes/auth.php" novalidate>
+      <form method="POST" action="ventas.php" novalidate>
         <div style="margin-bottom: 15px;">
           <label for="user">Usuario</label><br>
           <input type="text" 

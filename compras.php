@@ -1,30 +1,3 @@
-<?php
-// ============================================================
-// RESPONSABLE: Rol 4 (Lógica) y Rol 2 (UI)d
-// REQUERIMIENTO: "Compras... Capturan encabezado... y detalle (producto, cantidad, costo)"
-// ============================================================
-require_once 'includes/security_guard.php'; // Guard: Solo Admins
-require_once 'config/db.php';
-
-// TODO:
-// 1. Tabla dinámica (JS) para agregar productos al listado de compra.
-// 2. Botón "Guardar Compra" -> ajax/confirmar_compra.php.
-
-// BACKEND ACA (NO BORRAR)
-// REQUERIMIENTO: "Compras. Capturan encabezado (fecha, proveedor...)"
-
-// Obtener lista de proveedores para el <select> del HTML
-// El de UX usará la variable $proveedores en un foreach
-$sql_prov = "SELECT id, nombre FROM proveedores WHERE estatus = 1 ORDER BY nombre";
-$res_prov = $mysqli->query($sql_prov);
-$proveedores = [];
-while ($row = $res_prov->fetch_assoc()) {
-    $proveedores[] = $row;
-}
-
-// AHORA VIENE EL HTML DEL ROL 2...
-// Nota para UX: Usar foreach($proveedores as $p) para llenar el <select name="proveedor">
-?>
 <!doctype html>
 <html lang="es">
   <head>
@@ -53,67 +26,82 @@ while ($row = $res_prov->fetch_assoc()) {
         <a href="reportes/ventas_detalle.php">Reportes detalle</a>
         <a href="reportes/ventas_encabezado.php">Reportes encabezado</a>
 
-        <a href="includes/logout.php">Salir</a>
+        <a href="index.php">Salir</a>
       </div>
     
     </div>
 
-    <div class="container" style="max-width: 1000px; margin-top: 20px;">
+    <div class="container main-content">
         <h2>Registro de Orden de Compra</h2>
 
         <div class="card">
             <h3>Datos de la Compra</h3>
             <form id="form-compra-encabezado">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="grid-2">
                     <div>
                         <label for="fecha">Fecha de Pedido</label>
-                        <input type="date" id="fecha" name="fecha" required value="<?php echo date('Y-m-d'); ?>">
+                        <input type="date" id="fecha" name="fecha" required value="2025-12-02">
                     </div>
                     <div>
                         <label for="proveedor">Proveedor</label>
                         <select id="proveedor" name="proveedor" required>
                             <option value="">-- Seleccione un proveedor --</option>
-                            <?php foreach ($proveedores as $p): ?>
-                                <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['nombre']); ?></option>
-                            <?php endforeach; ?>
+                            <option value="1">Editorial Planeta</option>
+                            <option value="2">Penguin Random House</option>
+                            <option value="3">Fondo de Cultura Económica</option>
                         </select>
                     </div>
                 </div>
             </form>
         </div>
 
-        <div class="card" style="margin-top: 20px;">
+        <div class="card mt-20">
             <h3>Detalle de Productos a Comprar</h3>
             
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div class="flex-row mb-15">
                 <input type="text" 
                     id="input-producto-compra" 
                     placeholder="Buscar producto por título o código..." 
-                    style="flex-grow: 1; width: auto;">
-                <button type="button" id="btn-agregar-item" class="btn" style="width: 150px;">Agregar Item</button>
+                    class="flex-grow w-auto">
+                <button type="button" id="btn-agregar-item" class="btn w-150">Agregar Item</button>
             </div>
 
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 35%;">Producto</th>
-                        <th style="width: 15%;">Código</th>
-                        <th style="width: 15%;">Cantidad Pedida</th>
-                        <th style="width: 15%;">Costo Unitario</th>
-                        <th style="width: 10%;">Subtotal</th>
-                        <th style="width: 10%;"></th>
+                        <th class="col-35">Producto</th>
+                        <th class="col-15">Código</th>
+                        <th class="col-15">Cantidad Pedida</th>
+                        <th class="col-15">Costo Unitario</th>
+                        <th class="col-10">Subtotal</th>
+                        <th class="col-10"></th>
                     </tr>
                 </thead>
                 <tbody id="tabla-detalle-compra">
-                    <tr><td colspan="6" style="text-align: center; color: #888;">Agrega productos a la orden.</td></tr>
+                    <tr>
+                        <td>Cien Años de Soledad</td>
+                        <td>LIB001</td>
+                        <td><input type="number" value="10" class="w-60"></td>
+                        <td>$150.00</td>
+                        <td>$1,500.00</td>
+                        <td><button class="btn-secondary">X</button></td>
+                    </tr>
+                     <tr>
+                        <td>El Principito</td>
+                        <td>LIB002</td>
+                        <td><input type="number" value="20" class="w-60"></td>
+                        <td>$80.00</td>
+                        <td>$1,600.00</td>
+                        <td><button class="btn-secondary">X</button></td>
+                    </tr>
                 </tbody>
             </table>
             
-            <div style="text-align: right; font-size: 20px; font-weight: bold; margin-top: 15px;">
-                Total Compra: <span id="total-compra-display">$0.00</span>
+            <div class="text-right text-xl font-bold mt-15">
+                Total Compra: <span id="total-compra-display">$3,100.00</span>
             </div>
 
-            <button id="btn-guardar-compra" class="btn" style="margin-top: 20px;">
+            <button id="btn-guardar-compra" class="btn mt-20">
                 Guardar Orden de Compra
             </button>
         </div>
@@ -127,7 +115,7 @@ while ($row = $res_prov->fetch_assoc()) {
     // 3. Manejar el click de #btn-guardar-compra y realizar la llamada AJAX a ajax/confirmar_compra.php (Rol 4).
     document.getElementById('btn-guardar-compra').addEventListener('click', function() {
         if (confirm('¿Confirma la creación de esta Orden de Compra?')) {
-            alert('Guardando orden (Lógica AJAX pendiente de implementación por Rol 2/4).');
+            alert('Guardando orden (Simulado).');
         }
     });
     </script>

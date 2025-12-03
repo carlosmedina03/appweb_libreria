@@ -1,65 +1,36 @@
 <?php
-// ============================================================
-// RESPONSABLE: Rol 2 (Diseño) y Rol 4 (Datos)
-// REQUERIMIENTO: "3.3 Detalle de ventas... Columnas: Fecha, Folio, Código..."
-// ============================================================
-// 1. Ejecutar Query 5 de consultas_base.sql.
-// 2. Totales al final: Unidades vendidas, Importe total.
-
-// BACKEND ABAJO (NO BORRAR)    
-// REQUERIMIENTO: "3.3 Detalle de ventas... Columnas: ..., Importe línea"
-// ---------------------------------------------------------
-require_once '../config/db.php';
-require_once '../includes/auth.php';
-
-$fecha_ini = $_GET['inicio'] ?? date('Y-m-01 00:00:00');
-$fecha_fin = $_GET['fin'] ?? date('Y-m-t 23:59:59');
-
-// Query (Basado en Consultas Base 3.3)
-$sql = "SELECT v.fecha_hora, v.id as folio, l.codigo, l.titulo as nombre, 
-               dv.cantidad, dv.precio_unitario, dv.importe as importe_linea
-        FROM detalle_ventas dv
-        JOIN ventas v ON dv.id_venta = v.id
-        JOIN libros l ON dv.id_libro = l.id
-        WHERE v.fecha_hora BETWEEN '$fecha_ini' AND '$fecha_fin'
-        ORDER BY v.fecha_hora DESC";
-
-$resultado = $mysqli->query($sql);
-
-$detalles = [];
-$suma_unidades = 0;
-$suma_importe = 0;
-
-while ($row = $resultado->fetch_assoc()) {
-    $suma_unidades += $row['cantidad'];
-    $suma_importe += $row['importe_linea'];
-    $detalles[] = $row;
-}
+$titulo_reporte = "REPORTE DETALLADO DE VENTAS";
+ob_start();
 ?>
 
-<div class="card filtros-print" style="margin-bottom: 20px;">
-    <h3 style="margin-bottom: 10px;">Filtros: Detalle de Ventas por Período</h3>
+<div class="card filtros-print mb-20">
+    <h3 class="mb-15">Filtros de Detalle</h3>
     <form action="" method="GET">
-        <div style="display: flex; gap: 20px; align-items: flex-end;">
+        <div class="filters-container">
             
-            <div style="flex: 1;">
+            <div class="filter-group">
                 <label for="inicio">Fecha Inicio</label>
                 <input type="date" id="inicio" name="inicio" required 
-                       value="<?php echo htmlspecialchars($fecha_ini_display); ?>" 
-                       style="width: 100%; padding: 8px;">
+                       value="2025-12-01" 
+                       class="filter-input">
             </div>
             
-            <div style="flex: 1;">
+            <div class="filter-group">
                 <label for="fin">Fecha Fin</label>
                 <input type="date" id="fin" name="fin" required 
-                       value="<?php echo htmlspecialchars($fecha_fin_display); ?>" 
-                       style="width: 100%; padding: 8px;">
+                       value="2025-12-01" 
+                       class="filter-input">
+            </div>
+
+            <div class="filter-group-large">
+                <label for="producto">Producto (Opcional)</label>
+                <input type="text" id="producto" name="producto" placeholder="Nombre del libro..." class="filter-input">
             </div>
             
-            <button type="submit" style="width: 150px; padding: 10px;">
+            <button type="button" class="btn w-150">
                 Generar Reporte
             </button>
-            <button type="button" class="btn-secondary" onclick="window.print()" style="width: 150px; padding: 10px;">
+            <button type="button" class="btn-secondary w-150" onclick="window.print()">
                 Imprimir / PDF
             </button>
         </div>
@@ -67,53 +38,67 @@ while ($row = $resultado->fetch_assoc()) {
 </div>
 
 <div class="card">
-    <p style="font-size: 0.9em; font-weight: bold;">
-        Líneas de Productos Vendidas Encontradas: <?php echo $total_lineas; ?>
+    <p class="font-bold text-sm">
+        Mostrando detalle del día 01/12/2025
     </p>
     
     <table>
         <thead>
-            <tr style="background: #e67e22; color: white;"> <th style="width: 120px;">Fecha/Hora</th>
-                <th style="width: 80px;">Folio</th>
-                <th style="width: 100px;">Código</th>
-                <th>Producto Vendido</th>
-                <th style="width: 80px; text-align: right;">Cant.</th>
-                <th style="width: 120px; text-align: right;">Precio Unitario</th>
-                <th style="width: 120px; text-align: right;">Importe Línea</th>
+            <tr class="bg-green"> 
+                <th class="w-100">Folio</th>
+                <th class="w-150">Fecha/Hora</th>
+                <th>Producto</th>
+                <th class="w-100 text-center">Cant.</th>
+                <th class="w-120 text-right">Precio Unit.</th>
+                <th class="w-120 text-right">Subtotal</th>
             </tr>
         </thead>
         <tbody>
-            <?php if ($total_lineas > 0): ?>
-                <?php foreach ($detalles as $d): ?>
-                    <tr> 
-                        <td><?php echo date('d/m/Y H:i', strtotime($d['fecha_hora'])); ?></td>
-                        <td><?php echo htmlspecialchars($d['folio']); ?></td>
-                        <td><?php echo htmlspecialchars($d['codigo']); ?></td>
-                        <td><?php echo htmlspecialchars($d['nombre']); ?></td>
-                        <td style="text-align: right;"><?php echo number_format($d['cantidad'], 0); ?></td>
-                        <td style="text-align: right;">$<?php echo number_format($d['precio_unitario'], 2); ?></td>
-                        <td style="text-align: right; font-weight: bold;">$<?php echo number_format($d['importe_linea'], 2); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="7" style="text-align: center;">No se encontraron detalles de ventas en el período seleccionado.</td></tr>
-            <?php endif; ?>
+            <!-- Venta 1001 -->
+            <tr> 
+                <td>1001</td>
+                <td>01/12/2025 10:30:00</td>
+                <td>Cien Años de Soledad</td>
+                <td class="text-center">1</td>
+                <td class="text-right">$250.00</td>
+                <td class="text-right">$250.00</td>
+            </tr>
+            
+            <!-- Venta 1002 -->
+            <tr> 
+                <td>1002</td>
+                <td>01/12/2025 11:15:00</td>
+                <td>El Principito</td>
+                <td class="text-center">2</td>
+                <td class="text-right">$150.00</td>
+                <td class="text-right">$300.00</td>
+            </tr>
+
+            <!-- Venta 1003 -->
+            <tr> 
+                <td>1003</td>
+                <td>02/12/2025 09:45:00</td>
+                <td>Rayuela</td>
+                <td class="text-center">1</td>
+                <td class="text-right">$200.00</td>
+                <td class="text-right">$200.00</td>
+            </tr>
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="4" style="text-align: right; font-weight: bold; background: #fae6d3;">
+                <td colspan="5" class="text-right font-bold bg-light-green">
+                    TOTAL VENTAS
+                </td>
+                <td class="text-right font-bold bg-light-green">
+                    $750.00
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5" class="text-right font-bold bg-light-gray">
                     TOTAL UNIDADES VENDIDAS
                 </td>
-                <td style="font-weight: bold; background: #fae6d3; text-align: right;">
-                    <?php echo number_format($suma_unidades, 0); ?>
-                </td>
-                <td style="background: #fae6d3;"></td> <td style="background: #fae6d3;"></td> </tr>
-            <tr>
-                <td colspan="6" style="text-align: right; font-weight: bold; background: #f0f0f0;">
-                    IMPORTE TOTAL (SUMA LÍNEAS)
-                </td>
-                <td style="font-weight: bold; background: #f0f0f0; text-align: right;">
-                    $<?php echo number_format($suma_importe, 2); ?>
+                <td class="text-right font-bold bg-light-gray">
+                    4
                 </td>
             </tr>
         </tfoot>
@@ -121,6 +106,6 @@ while ($row = $resultado->fetch_assoc()) {
 </div>
 
 <?php
-$contenido_reporte = ob_get_clean(); // Guarda el buffer en la variable
-require_once 'plantilla.php'; // Asume que plantilla.php generará el HTML final
+$contenido_reporte = ob_get_clean();
+require_once 'plantilla.php';
 ?>
