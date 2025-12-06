@@ -11,7 +11,7 @@
 // REQUERIMIENTO: "Filtros obligatorios: q (código/nombre), solo activos"
 // ---------------------------------------------------------
 require_once '../config/db.php';
-require_once '../includes/security_guard.php';
+require_once '../includes/security_guardr.php';
 
 // 1. Recibir Filtros
 $filtro_q = isset($_GET['q']) ? $mysqli->real_escape_string($_GET['q']) : '';
@@ -74,7 +74,7 @@ ob_start();
             <button type="button" class="btn w-150">
                 Filtrar
             </button>
-            <button type="button" class="btn-secondary w-150" onclick="window.print()">
+            <button type="button" class="btn w-150" onclick="window.print()">
                 Imprimir / PDF
             </button>
         </div>

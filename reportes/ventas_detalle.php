@@ -10,7 +10,7 @@
 // REQUERIMIENTO: "3.3 Detalle de ventas... Columnas: ..., Importe línea"
 // ---------------------------------------------------------
 require_once '../config/db.php';
-require_once '../includes/security_guard.php';
+require_once '../includes/security_guardr.php';
 
 $fecha_ini = $_GET['inicio'] ?? date('Y-m-01 00:00:00');
 $fecha_fin = $_GET['fin'] ?? date('Y-m-t 23:59:59');
@@ -68,7 +68,7 @@ ob_start();
             <button type="button" class="btn w-150">
                 Generar Reporte
             </button>
-            <button type="button" class="btn-secondary w-150" onclick="window.print()">
+            <button type="button" class="btn w-150" onclick="window.print()">
                 Imprimir / PDF
             </button>
         </div>

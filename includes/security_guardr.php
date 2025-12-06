@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // 1. Si no hay sesión, al Login
 if (!isset($_SESSION['user'])) {
-    header('Location: index.php'); 
+    header('Location: ../index.php'); 
     exit;
 }
 
@@ -17,7 +17,7 @@ if ($_SESSION['user']['rol'] !== 'admin') {
     echo "<h1 style='color:red;'>403 Acceso Prohibido</h1>";
     echo "<p>Tu rol de <strong>Operador</strong> no tiene permisos para ver esta sección.</p>";
     // CORREGIDO: Volver al Dashboard
-    echo "<a href='dashboard.php' style='padding:10px; background:#333; color:white; text-decoration:none; border-radius:5px;'>Volver al Dashboard</a>";
+    echo "<a href='../dashboard.php' style='padding:10px; background:#333; color:white; text-decoration:none; border-radius:5px;'>Volver al Dashboard</a>";
     echo "</div>";
     exit; 
 }

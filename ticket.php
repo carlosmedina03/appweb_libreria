@@ -61,6 +61,40 @@ if ($tipo === 'devolucion') {
     $detalles = $mysqli->query($sql_det);
 }
 
+/**
+ * Función inteligente para formatear una línea de producto para el ticket.
+ * Se ajusta a nombres largos y alinea columnas perfectamente.
+ * @param string $nombre El nombre del producto.
+ * @param int $cantidad La cantidad vendida.
+ * @param float $precio El precio unitario.
+ * @param float $importe El importe total de la línea.
+ * @param int $anchoTotal El número total de caracteres del ticket (aprox. 40-48 para 80mm).
+ * @return string El texto de la línea formateado.
+ */
+function imprimir_linea($nombre, $cantidad, $precio, $importe, $anchoTotal = 42) {
+    $anchoPrecio = 9; // Ancho para el importe
+    $anchoCantidad = 4; // Ancho para la cantidad
+    $anchoNombre = $anchoTotal - $anchoPrecio - $anchoCantidad;
+
+    // Formatear datos
+    $cantidadStr = str_pad($cantidad, $anchoCantidad, " ", STR_PAD_LEFT);
+    $importeStr = str_pad('$' . number_format($importe, 2), $anchoPrecio, " ", STR_PAD_LEFT);
+
+    // Ajustar nombre del producto si es muy largo
+    $lineasNombre = wordwrap($nombre, $anchoNombre, "\n", true);
+    $lineas = explode("\n", $lineasNombre);
+
+    $lineaPrincipal = str_pad($lineas[0], $anchoNombre) . $cantidadStr . $importeStr;
+
+    // Si el nombre ocupa más de una línea
+    if (count($lineas) > 1) {
+        for ($i = 1; $i < count($lineas); $i++) {
+            $lineaPrincipal .= "\n" . str_pad($lineas[$i], $anchoTotal);
+        }
+    }
+    return $lineaPrincipal;
+}
+
 // AHORA VIENE EL HTML DEL ROL 2 (UX)...
 //FRONTEND ABAJO
 ?>
@@ -72,21 +106,21 @@ if ($tipo === 'devolucion') {
     <title><?php echo $titulo_ticket; ?> #<?php echo $folio; ?></title>
     <link rel="stylesheet" href="css/ticket.css">
   </head>
-
-  <body onload="window.print()">
+  
+  <body>
     <div class="ticket">
       <div style="text-align: center;">
-        <img src="assets/img/logo-maria-de-letras_v2_monocromo.svg" alt="Logo" style="width: 50mm; margin-bottom: 5px;">
-        <h1 style="font-size: 14pt; margin: 0;"><?php echo htmlspecialchars($negocio['nombre']); ?></h1>
-        <p style="font-size: 8pt; margin: 2px 0;">
-          <?php echo htmlspecialchars($negocio['direccion']); ?>
+        <img src="img.php?tipo=logo" alt="Logo" style="max-width: 160px; max-height: 80px; margin-bottom: 5px;">
+        <h1 style="font-size: 12pt; margin: 0;"><?php echo htmlspecialchars($negocio['razon_social']); ?></h1>
+        <p style="margin: 2px 0; font-size: 7.5pt;">
+          <?php echo htmlspecialchars($negocio['domicilio']); ?>
           <br>
-          Tel: <?php echo htmlspecialchars($negocio['telefono']); ?>
+          Tel: <?php echo htmlspecialchars($negocio['telefono'] ?? ''); ?>
         </p>
         <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
       </div>
       
-      <div style="font-size: 9pt;">
+      <div>
         <p style="margin: 0; font-weight: bold;"><?php echo $titulo_ticket; ?>: <?php echo $encabezado['id']; ?></p>
         <?php if ($tipo === 'devolucion'): ?>
             <p style="margin: 0;">SOBRE VENTA ORIGINAL: #<?php echo $encabezado['folio_original']; ?></p>
@@ -96,48 +130,39 @@ if ($tipo === 'devolucion') {
         <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
       </div>
 
-      <div style="font-size: 8pt;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr>
-              <th style="text-align: left; width: 55%; padding: 1px 0;">PRODUCTO</th>
-              <th style="text-align: center; width: 10%; padding: 1px 0;">CNT</th>
-              <th style="text-align: right; width: 15%; padding: 1px 0;">PRECIO</th>
-              <th style="text-align: right; width: 20%; padding: 1px 0;">IMPORTE</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php 
-            $subtotal = 0;
-            while ($item = $detalles->fetch_assoc()): 
-                $subtotal += $item['importe'];
-            ?>
-            <tr>
-              <td style="text-align: left; padding: 1px 0;"><?php echo htmlspecialchars(substr($item['titulo'], 0, 25)); ?></td>
-              <td style="text-align: center; padding: 1px 0;"><?php echo $item['cantidad']; ?></td>
-              <td style="text-align: right; padding: 1px 0;"><?php echo number_format($item['precio_unitario'], 2); ?></td>
-              <td style="text-align: right; padding: 1px 0;"><?php echo number_format($item['importe'], 2); ?></td>
-            </tr>
-            <?php endwhile; ?>
-          </tbody>
-        </table>
+      <div class="detalle-productos">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed black; margin-bottom: 3px; font-weight: bold;">
+            <span>PRODUCTO</span>
+            <span>CANT/TOTAL</span>
+        </div>
+        <pre><?php
+          while ($item = $detalles->fetch_assoc()) {
+              echo imprimir_linea(
+                  htmlspecialchars($item['titulo']),
+                  $item['cantidad'],
+                  $item['precio_unitario'],
+                  $item['importe']
+              );
+              echo "\n";
+          }
+        ?></pre>
       </div>
 
       <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
 
-      <div style="font-size: 10pt; text-align: right;">
+      <div style="text-align: right;">
         <?php if ($tipo === 'venta'): ?>
-            <p style="margin: 0;">**SUBTOTAL:** $<?php echo number_format($encabezado['subtotal'], 2); ?></p>
-            <p style="margin: 0;">**IVA (16%):** $<?php echo number_format($encabezado['iva'], 2); ?></p>
-            <h2 style="margin: 5px 0 10px 0; font-size: 14pt;">**TOTAL:** $<?php echo number_format($encabezado['total'], 2); ?></h2>
+            <p style="margin: 0;">SUBTOTAL: $<?php echo number_format($encabezado['subtotal'], 2); ?></p>
+            <p style="margin: 0;">IVA (16%): $<?php echo number_format($encabezado['iva'], 2); ?></p>
+            <h2 style="margin: 5px 0 10px 0; font-size: 11pt; font-weight: bold;">TOTAL: $<?php echo number_format($encabezado['total'], 2); ?></h2>
         <?php else: ?>
-            <h2 style="margin: 5px 0 10px 0; font-size: 14pt;">**TOTAL REEMBOLSADO:** $<?php echo number_format($encabezado['total_reembolsado'], 2); ?></h2>
+            <h2 style="margin: 5px 0 10px 0; font-size: 11pt; font-weight: bold;">TOTAL REEMBOLSADO: $<?php echo number_format($encabezado['total_reembolsado'], 2); ?></h2>
         <?php endif; ?>
       </div>
 
-      <div style="text-align: center; font-size: 8pt; margin-top: 10px;">
+      <div style="text-align: center; margin-top: 10px;">
         <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
-        <p style="margin: 0;"><?php echo htmlspecialchars($negocio['mensaje_final']); ?></p>
+        <p style="margin: 0;"><?php echo htmlspecialchars($negocio['mensaje_ticket'] ?? '¡Gracias por su compra!'); ?></p>
         <p style="margin: 2px 0 0 0;">(Powered by Sistema MDL)</p>
       </div>
 
@@ -145,5 +170,13 @@ if ($tipo === 'devolucion') {
           <button onclick="window.close()" class="btn" style="width: 80%; background: #555;">Cerrar Ticket</button>
       </div>
     </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.print();
+            }, 500); // 500ms de retardo para asegurar que todo cargue
+        });
+    </script>
   </body>
 </html>

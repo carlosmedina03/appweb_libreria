@@ -38,25 +38,40 @@ if (isset($mysqli)) {
   </head>
 
   <body>
-    <div class="navbar">
-      <div class="navbar-logo">
-        <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo de María de Letras">
-      </div>
-      <div class="navbar-menu">
-        <a href="ventas.php">Punto de ventas</a>
+<div class="navbar">
         
-        <?php if ($rol === 'admin'): ?>
-            <a href="compras.php">Compras</a>
-            <a href="devoluciones.php">Devoluciones</a>
-            <a href="usuarios.php">Usuarios</a> <a href="productos.php">Productos</a>
+        <div class="navbar-logo">
+            <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
+        </div>
+
+        <div class="navbar-menu">
+            <a href="dashboard.php">Inicio</a>
+            <a href="ventas.php">Punto de Venta</a>
             
-            <a href="reportes/compras.php">Reportes</a>
-        <?php else: ?>
-            <a href="devoluciones.php">Devoluciones</a>
-        <?php endif; ?>
-        
-        <a href="includes/logout.php" style="background: #333; color: white;">Salir</a>
-      </div>
+            <?php if (isset($_SESSION['user']['rol']) && $_SESSION['user']['rol'] === 'admin'): ?>
+                <a href="productos.php">Productos</a>
+                <a href="compras.php">Compras</a>
+                <a href="devoluciones.php">Devoluciones</a>
+                <a href="usuarios.php">Usuarios</a>
+
+                <div class="dropdown">
+                    <button class="dropbtn">Reportes ▾</button>
+                    <div class="dropdown-content">
+                        <a href="reportes/compras.php">Reportes Compra</a>
+                        <a href="reportes/devoluciones.php">Reportes Devoluciones</a>
+                        <a href="reportes/inventario.php">Reportes Inventario</a>
+                        <a href="reportes/ventas_detalle.php">Reportes Detalle</a>
+                        <a href="reportes/ventas_encabezado.php">Reportes Encabezado</a>
+                    </div>
+                </div>
+
+            <?php else: ?>
+                <a href="devoluciones.php">Devoluciones</a>
+            <?php endif; ?>
+            
+            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+        </div>
+
     </div>
 
     <div class="container main-content">
@@ -123,12 +138,147 @@ if (isset($mysqli)) {
     </div>
     
     <script src="js/main.js"></script>
-    <script>
-    document.getElementById('btn-guardar-compra').addEventListener('click', function() {
-        if (confirm('¿Confirma la creación de esta Orden de Compra?')) {
-            alert('Lógica de guardado pendiente (AJAX).');
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputProducto = document.getElementById('input-producto-compra');
+    const btnAgregar = document.getElementById('btn-agregar-item');
+    const tablaDetalle = document.getElementById('tabla-detalle-compra');
+    const totalDisplay = document.getElementById('total-compra-display');
+    const btnGuardar = document.getElementById('btn-guardar-compra');
+    const selectProveedor = document.getElementById('proveedor');
+
+    let itemsCompra = {}; // Objeto para guardar los items de la compra
+
+    // 1. Agregar item al presionar Enter o clic
+    btnAgregar.addEventListener('click', buscarYAgregarProducto);
+    inputProducto.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            buscarYAgregarProducto();
         }
     });
-    </script>
+
+    async function buscarYAgregarProducto() {
+        const query = inputProducto.value.trim();
+        if (!query) return;
+
+        try {
+            const response = await fetch(`ajax/buscar_producto.php?q=${query}`);
+            const productos = await response.json();
+
+            if (productos.length > 0) {
+                const producto = productos[0]; // Tomamos el primer resultado
+                if (!itemsCompra[producto.id]) { // Evitar duplicados
+                    itemsCompra[producto.id] = {
+                        id_libro: producto.id,
+                        titulo: producto.titulo,
+                        codigo: producto.codigo,
+                        cantidad: 1,
+                        costo: 0.00
+                    };
+                    renderizarTabla();
+                }
+                inputProducto.value = '';
+            } else {
+                alert('Producto no encontrado.');
+            }
+        } catch (error) {
+            console.error('Error al buscar producto:', error);
+        }
+    }
+
+    function renderizarTabla() {
+        tablaDetalle.innerHTML = '';
+        if (Object.keys(itemsCompra).length === 0) {
+            tablaDetalle.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">Agrega productos para comenzar la orden</td></tr>';
+            calcularTotal();
+            return;
+        }
+
+        for (const id in itemsCompra) {
+            const item = itemsCompra[id];
+            const subtotal = (item.cantidad * item.costo).toFixed(2);
+            const fila = `
+                <tr data-id="${item.id_libro}">
+                    <td>${item.titulo}</td>
+                    <td>${item.codigo}</td>
+                    <td><input type="number" class="input-cantidad" value="${item.cantidad}" min="1" style="width: 80px; text-align: center;"></td>
+                    <td><input type="number" class="input-costo" value="${item.costo.toFixed(2)}" min="0" step="0.01" style="width: 100px; text-align: right;"></td>
+                    <td class="text-right subtotal-celda">$${subtotal}</td>
+                    <td class="text-center"><button type="button" class="btn-remover" style="background: #c0392b; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px;">X</button></td>
+                </tr>
+            `;
+            tablaDetalle.innerHTML += fila;
+        }
+        calcularTotal();
+        agregarListenersInputs();
+    }
+
+    function agregarListenersInputs() {
+        tablaDetalle.querySelectorAll('tr').forEach(fila => {
+            const id = fila.dataset.id;
+            fila.querySelector('.input-cantidad').addEventListener('change', (e) => {
+                itemsCompra[id].cantidad = parseInt(e.target.value) || 1;
+                renderizarTabla();
+            });
+            fila.querySelector('.input-costo').addEventListener('change', (e) => {
+                // CORRECCIÓN: Reemplazar coma por punto para asegurar el parseo correcto de decimales.
+                itemsCompra[id].costo = parseFloat(e.target.value.replace(',', '.')) || 0.00;
+                renderizarTabla();
+            });
+            fila.querySelector('.btn-remover').addEventListener('click', () => {
+                delete itemsCompra[id];
+                renderizarTabla();
+            });
+        });
+    }
+
+    function calcularTotal() {
+        let total = 0;
+        for (const id in itemsCompra) {
+            total += itemsCompra[id].cantidad * itemsCompra[id].costo;
+        }
+        totalDisplay.textContent = `$${total.toFixed(2)}`;
+    }
+
+    // 2. Guardar la orden de compra
+    btnGuardar.addEventListener('click', async function() {
+        if (!selectProveedor.value) {
+            alert('Por favor, seleccione un proveedor.');
+            return;
+        }
+        if (Object.keys(itemsCompra).length === 0) {
+            alert('Debe agregar al menos un producto a la orden.');
+            return;
+        }
+
+        if (confirm('¿Confirma la creación de esta Orden de Compra? El stock se incrementará.')) {
+            const datosCompra = {
+                proveedor: selectProveedor.value,
+                items: Object.values(itemsCompra)
+            };
+
+            try {
+                const response = await fetch('ajax/confirmar_compra.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosCompra)
+                });
+                const resultado = await response.json();
+
+                if (resultado.status === 'ok') {
+                    alert(`Compra registrada con éxito. Folio: ${resultado.folio}`);
+                    window.location.reload(); // Recargar para limpiar
+                } else {
+                    alert('Error: ' + resultado.msg);
+                }
+            } catch (error) {
+                console.error('Error al guardar la compra:', error);
+                alert('Ocurrió un error de conexión.');
+            }
+        }
+    });
+});
+</script>
   </body>
 </html>

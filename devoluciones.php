@@ -18,26 +18,26 @@ $mensaje_exito = "";
 // LÓGICA DE BÚSQUEDA (Backend)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
     $folio_busqueda = $mysqli->real_escape_string($_POST['folio_input']); // Sanitizar entrada
+    $folio_id = intval($folio_busqueda);
 
     // 1. Buscar encabezado de venta
-    // Asegurarse de usar nombres de tablas correctos (ventas vs ventas_encabezado)
-    $sql_v = "SELECT v.id, v.fecha, v.total, u.nombre_completo as cajero 
+    $sql_v = "SELECT v.id, v.fecha_hora, v.total, u.nombre_completo as cajero 
               FROM ventas v 
-              JOIN usuarios u ON v.usuario_id = u.id 
-              WHERE v.folio = '$folio_busqueda' OR v.id = '$folio_busqueda'";
+              JOIN usuarios u ON v.id_usuario = u.id 
+              WHERE v.id = '$folio_id'";
     
     $res_v = $mysqli->query($sql_v);
 
     if ($res_v && $res_v->num_rows > 0) {
         $venta_encontrada = $res_v->fetch_assoc();
-        $id_venta_encontrada = $venta_encontrada['id'];
+        $id_venta_encontrada = intval($venta_encontrada['id']);
 
         // 2. Buscar detalles
-        // JOIN con items para saber nombre y código
-        $sql_d = "SELECT dv.item_id, dv.cantidad, dv.precio_unitario, dv.importe, i.nombre, i.codigo 
-                  FROM ventas_det dv 
-                  JOIN items i ON dv.item_id = i.id 
-                  WHERE dv.venta_id = $id_venta_encontrada";
+        // JOIN con libros para saber nombre y código
+        $sql_d = "SELECT dv.id_libro, dv.cantidad, dv.precio_unitario, dv.importe, l.titulo, l.codigo 
+                  FROM detalle_ventas dv 
+                  JOIN libros l ON dv.id_libro = l.id 
+                  WHERE dv.id_venta = $id_venta_encontrada";
         
         $res_d = $mysqli->query($sql_d);
         
@@ -62,24 +62,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
 
   <body>
     <div class="navbar">
-      <div class="navbar-logo">
-        <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
-      </div>
-      <div class="navbar-menu">
-        <a href="ventas.php">Punto de ventas</a>
         
-        <?php if ($rol === 'admin'): ?>
-            <a href="compras.php">Compras</a>
-            <a href="devoluciones.php">Devoluciones</a>
-            <a href="usuarios.php">Usuarios</a>
-            <a href="productos.php">Productos</a>
-            <a href="reportes/inventario.php">Reportes</a>
-        <?php else: ?>
-            <a href="devoluciones.php">Devoluciones</a>
-        <?php endif; ?>
-        
-        <a href="includes/logout.php" style="background: #333; color: white;">Salir</a>
-      </div>
+        <div class="navbar-logo">
+            <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
+        </div>
+
+        <div class="navbar-menu">
+            <a href="dashboard.php">Inicio</a>
+            <a href="ventas.php">Punto de Venta</a>
+            
+            <?php if (isset($_SESSION['user']['rol']) && $_SESSION['user']['rol'] === 'admin'): ?>
+                <a href="productos.php">Productos</a>
+                <a href="compras.php">Compras</a>
+                <a href="devoluciones.php">Devoluciones</a>
+                <a href="usuarios.php">Usuarios</a>
+
+                <div class="dropdown">
+                    <button class="dropbtn">Reportes ▾</button>
+                    <div class="dropdown-content">
+                        <a href="reportes/compras.php">Reportes Compra</a>
+                        <a href="reportes/devoluciones.php">Reportes Devoluciones</a>
+                        <a href="reportes/inventario.php">Reportes Inventario</a>
+                        <a href="reportes/ventas_detalle.php">Reportes Detalle</a>
+                        <a href="reportes/ventas_encabezado.php">Reportes Encabezado</a>
+                    </div>
+                </div>
+
+            <?php else: ?>
+                <a href="devoluciones.php">Devoluciones</a>
+            <?php endif; ?>
+            
+            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+        </div>
+
     </div>
 
     <div class="container main-content-small">
@@ -98,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
                     <input type="text" 
                         id="folio_input" 
                         name="folio_input" 
-                        placeholder="Ingresa Folio (Ej: V-00001)" 
+                        placeholder="Ingresa Folio (Ej: 1001)" 
                         required 
                         class="flex-grow w-auto"
                         value="<?php echo isset($_POST['folio_input']) ? htmlspecialchars($_POST['folio_input']) : ''; ?>">
@@ -111,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
         <div class="card mt-20">
             <h3>Venta Encontrada (#<?php echo htmlspecialchars($venta_encontrada['id']); ?>)</h3>
             <p>
-                Fecha: <strong><?php echo $venta_encontrada['fecha']; ?></strong> | 
+                Fecha: <strong><?php echo date('d/m/Y H:i', strtotime($venta_encontrada['fecha_hora'])); ?></strong> | 
                 Total Venta: <strong>$<?php echo number_format($venta_encontrada['total'], 2); ?></strong> | 
                 Cajero: <strong><?php echo htmlspecialchars($venta_encontrada['cajero']); ?></strong>
             </p>
@@ -135,15 +150,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
                         <?php foreach ($detalles_venta as $item): ?>
                         <tr>
                             <td style="text-align: center;">
-                                <input type="checkbox" class="check-devolucion" data-id="<?php echo $item['item_id']; ?>">
+                                <input type="checkbox" class="check-devolucion" data-id="<?php echo $item['id_libro']; ?>">
                             </td>
-                            <td><?php echo htmlspecialchars($item['nombre']); ?></td>
+                            <td><?php echo htmlspecialchars($item['titulo']); ?></td>
                             <td><?php echo htmlspecialchars($item['codigo']); ?></td>
                             <td style="text-align: center;"><?php echo $item['cantidad']; ?></td>
                             <td style="text-align: center;">
                                 <input type="number" 
                                     class="input-cant-dev"
-                                    id="cant_<?php echo $item['item_id']; ?>"
+                                    id="cant_<?php echo $item['id_libro']; ?>"
                                     min="1" 
                                     max="<?php echo $item['cantidad']; ?>" 
                                     value="1" 
@@ -155,10 +170,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-                
-                <button type="button" id="btn-procesar-devolucion" class="btn mt-15" style="background-color: #ffc107; color: #000;">
-                    Procesar Devolución Seleccionada
-                </button>
+                <div class="mt-15">
+                    <label for="motivo_devolucion">Motivo de la Devolución</label>
+                    <input type="text" id="motivo_devolucion" name="motivo_devolucion" placeholder="Ej: Defecto de fábrica, cliente se arrepintió..." style="width: 100%;">
+                </div>
+                <div class="text-right">
+                    <button type="button" id="btn-procesar-devolucion" class="btn mt-15" style="background-color: #c0392b;">
+                        Procesar Devolución Seleccionada
+                    </button>
+                </div>
             </form>
         </div>
         <?php endif; ?>
@@ -176,9 +196,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
             });
         });
 
-        document.getElementById('btn-procesar-devolucion')?.addEventListener('click', function() {
-            if (confirm('¿Está seguro de procesar esta devolución? El stock será restaurado.')) {
-                alert('Lógica AJAX pendiente (Rol 4).');
+        const btnProcesar = document.getElementById('btn-procesar-devolucion');
+        if (btnProcesar) {
+            btnProcesar.addEventListener('click', async function() {
+                const itemsADevolver = [];
+                document.querySelectorAll('.check-devolucion:checked').forEach(check => {
+                    const id = check.getAttribute('data-id');
+                    const cantidadInput = document.getElementById('cant_' + id);
+                    itemsADevolver.push({
+                        id_libro: parseInt(id),
+                        cantidad: parseInt(cantidadInput.value)
+                    });
+                });
+
+                if (itemsADevolver.length === 0) {
+                    alert('Debe seleccionar al menos un producto para devolver.');
+                    return;
+                }
+
+                const idVenta = document.getElementById('venta_id_origen').value;
+                const motivo = document.getElementById('motivo_devolucion').value;
+
+                if (confirm('¿Está seguro de procesar esta devolución? El stock será restaurado.')) {
+                    try {
+                        const response = await fetch('ajax/confirmar_devolucion.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                id_venta: parseInt(idVenta),
+                                items: itemsADevolver,
+                                motivo: motivo
+                            })
+                        });
+                        const resultado = await response.json();
+                        if (resultado.status === 'ok') {
+                            alert(`Devolución registrada con éxito. Folio de devolución: ${resultado.folio}\nSe abrirá el comprobante para imprimir.`);
+                            window.open(`ticket.php?folio=${resultado.folio}&tipo=devolucion`, '_blank');
+                            window.location.href = 'devoluciones.php'; // Recargar para limpiar
+                        } else {
+                            alert('Error: ' + resultado.msg);
+                        }
+                    } catch (error) {
+                        console.error('Error al procesar devolución:', error);
+                        alert('Ocurrió un error de conexión.');
+                    }
+                }
+            });
+        }
+    </script>
+  </body>
+</html>
             }
         });
     </script>

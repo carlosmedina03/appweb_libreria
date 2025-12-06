@@ -88,23 +88,39 @@ while ($row = $resultado->fetch_assoc()) {
   </head>
 
   <body>
-    <div class="navbar">
-      <div class="navbar-logo">
-        <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
-      </div>
-      <div class="navbar-menu">
-        <a href="ventas.php">Punto de ventas</a>
+<div class="navbar">
         
-        <?php if ($rol === 'admin'): ?>
-            <a href="compras.php">Compras</a>
-            <a href="devoluciones.php">Devoluciones</a>
-            <a href="usuarios.php">Usuarios</a>
-            <a href="productos.php">Productos</a>
-            <a href="reportes/inventario.php">Reportes</a>
-        <?php endif; ?>
-        
-        <a href="includes/logout.php" style="background: #333; color: white;">Salir</a>
-      </div>
+        <div class="navbar-logo">
+            <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
+        </div>
+
+        <div class="navbar-menu">
+            <a href="dashboard.php">Inicio</a>
+            <a href="ventas.php">Punto de Venta</a>
+            
+            <?php if (isset($_SESSION['user']['rol']) && $_SESSION['user']['rol'] === 'admin'): ?>
+                <a href="productos.php">Productos</a>
+                <a href="compras.php">Compras</a>
+                <a href="devoluciones.php">Devoluciones</a>
+                <a href="usuarios.php">Usuarios</a>
+
+                <div class="dropdown">
+                    <button class="dropbtn">Reportes ▾</button>
+                    <div class="dropdown-content">
+                        <a href="reportes/compras.php">Reportes Compra</a>
+                        <a href="reportes/devoluciones.php">Reportes Devoluciones</a>
+                        <a href="reportes/inventario.php">Reportes Inventario</a>
+                        <a href="reportes/ventas_detalle.php">Reportes Detalle</a>
+                        <a href="reportes/ventas_encabezado.php">Reportes Encabezado</a>
+                    </div>
+                </div>
+
+            <?php else: ?>
+                <a href="devoluciones.php">Devoluciones</a>
+            <?php endif; ?>
+            
+            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+        </div>
     </div>
 
     <div class="container main-content">

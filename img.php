@@ -20,7 +20,9 @@ if ($tipo === 'logo') {
     } else {
         // Imagen por defecto si no hay logo
         header("Content-type: image/png");
-        readfile("assets/img/logo_temp.png"); 
+        // Devolver un PNG transparente de 1x1 pixel para no romper el layout
+        echo base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
+
     }
 
 } else {
@@ -37,8 +39,8 @@ if ($tipo === 'logo') {
     } else {
         // Imagen placeholder si no tiene foto
         header("Content-type: image/png");
-        // Asegúrate de tener una imagen gris llamada placeholder.png en assets/img
-        readfile("assets/img/logo_temp.png"); 
+        // Devolver un PNG transparente de 1x1 pixel para no romper el layout
+        echo base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
     }
 }
 ?>

@@ -1,15 +1,13 @@
----- ==========================================================
+
 -- ARCHIVO: schema.sql
 -- DEFINE LA ESTRUCTURA Y RELACIONES DE LA BASE DE DATOS
--- ==========================================================
 
 DROP DATABASE IF EXISTS libreria_db;
 CREATE DATABASE libreria_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE libreria_db;
 
--- ================================================
 -- 1. CONFIGURACIÓN Y SISTEMA
--- ================================================
+
 CREATE TABLE configuracion (
     id INT PRIMARY KEY DEFAULT 1,
     razon_social VARCHAR(150) NOT NULL,
@@ -22,9 +20,7 @@ CREATE TABLE configuracion (
     logo_empresa LONGBLOB
 ) ENGINE=InnoDB;
 
--- ================================================
 -- 2. USUARIOS Y ROLES (Cumpliendo Requerimiento PDF Punto 5)
--- ================================================
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_completo VARCHAR(100) NOT NULL,
@@ -35,9 +31,7 @@ CREATE TABLE usuarios (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- ================================================
 -- 3. CATÁLOGOS
--- ================================================
 CREATE TABLE proveedores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -65,9 +59,7 @@ CREATE TABLE libros_codigos (
     FOREIGN KEY (id_libro) REFERENCES libros(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- ================================================
 -- 4. MULTIMEDIA E INVENTARIO
--- ================================================
 CREATE TABLE imagenes_libro (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_libro INT NOT NULL,
@@ -85,9 +77,7 @@ CREATE TABLE existencias (
     FOREIGN KEY (id_libro) REFERENCES libros(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- ================================================
 -- 5. COMPRAS
--- ================================================
 CREATE TABLE compras (
     id INT AUTO_INCREMENT PRIMARY KEY,
     folio_proveedor VARCHAR(50),
@@ -110,9 +100,7 @@ CREATE TABLE detalle_compras (
     CONSTRAINT fk_dc_libro FOREIGN KEY (id_libro) REFERENCES libros(id)
 ) ENGINE=InnoDB;
 
--- ================================================
 -- 6. VENTAS
--- ================================================
 CREATE TABLE ventas (
     id INT AUTO_INCREMENT PRIMARY KEY, -- FOLIO del ticket
     fecha_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -136,9 +124,7 @@ CREATE TABLE detalle_ventas (
     CONSTRAINT fk_dv_libro FOREIGN KEY (id_libro) REFERENCES libros(id)
 ) ENGINE=InnoDB;
 
--- ================================================
 -- 7. DEVOLUCIONES
--- ================================================
 CREATE TABLE devoluciones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_venta INT NOT NULL,

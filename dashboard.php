@@ -17,40 +17,28 @@ $rol = $usuario['rol'];
     <title>María de Letras | Dashboard</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" type="image/png" href="assets/img/logo-maria-de-letras_icon.svg">
-    <style>
-        /* Estilos rápidos para el grid del dashboard */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px 0;
-        }
-        .welcome-banner {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 5px solid #C82B1D;
-        }
-    </style>
 </head>
 
 <body>
+
+<header>
     <div class="navbar">
         <div class="navbar-logo">
             <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
         </div>
         <div class="navbar-menu">
             <span>Hola, <strong><?php echo htmlspecialchars($nombre_usuario); ?></strong> (<?php echo ucfirst($rol); ?>)</span>
-            <a href="includes/logout.php" style="background-color: #333; padding: 5px 10px; border-radius: 4px; color: white; text-decoration: none;">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
         </div>
     </div>
 
-    <div class="container" style="max-width: 1000px; margin-top: 20px;">
-        
+</header>
+
+    <div class="container-dashboard">
+       
         <div class="welcome-banner">
             <h2>Panel de Control</h2>
-            <p>Bienvenido al sistema de gestión.</p>
+            <p>Bienvenido al sistema de gestión de la librería.</p>
         </div>
 
         <div class="dashboard-grid">
@@ -64,38 +52,51 @@ $rol = $usuario['rol'];
             <div class="card">
                 <h3>Devoluciones</h3>
                 <p>Gestionar devoluciones de productos.</p>
-                <a href="devoluciones.php" class="btn-secondary w-full" style="display:block; text-align:center;">Ir a Devoluciones</a>
+                <a href="devoluciones.php" class="btn w-full" style="display:block; text-align:center;">Ir a Devoluciones</a>
             </div>
-
-            <?php if ($rol === 'admin'): ?>
+        </div>
+<?php if ($rol === 'admin'): ?>
                 
-                <div class="card admin-panel" style="grid-column: 1 / -1; background-color: #fff8f8; border: 1px solid #eec;">
-                    <h3 style="color: #C82B1D;">Administración Global</h3>
-                    <p style="font-size: 0.9em; color: #666;">Zona restringida para gestión del negocio.</p>
-                    <hr class="mb-15" style="border-top: 1px solid #eee; margin: 15px 0;">
+                <div class="card admin-panel-container">
+                    <div class="admin-header">
+                        <h3>Administración Global</h3>
+                        <p>Zona restringida para gestión del negocio.</p>
+                    </div>
+                    <hr class="divider"> 
                     
-                    <ul style="list-style-type: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        <li>
-                            <a href="usuarios.php" class="btn w-full">Gestionar Usuarios</a>
-                        </li>
-                        <li>
-                            <a href="productos.php" class="btn w-full">Catálogo de Libros</a>
-                        </li>
-                        <li>
-                            <a href="compras.php" class="btn w-full">Registrar Compras</a>
-                        </li>
-                        <li>
-                            <a href="reportes/inventario.php" class="btn-secondary w-full">Reporte Inventario</a>
-                        </li>
-                        <li>
-                            <a href="reportes/ventas_encabezado.php" class="btn-secondary w-full">Reporte Ventas</a>
-                        </li>
-                    </ul>
+                    <div class="admin-grid-actions">
+                        
+                        <a href="usuarios.php" class="admin-btn-card">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            <span>Gestionar Usuarios</span>
+                        </a>
+
+                        <a href="productos.php" class="admin-btn-card">
+                            <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                            <span>Catálogo de Libros</span>
+                        </a>
+
+                        <a href="compras.php" class="admin-btn-card">
+                            <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                            <span>Registrar Compras</span>
+                        </a>
+
+                        <a href="reportes/inventario.php" class="admin-btn-card">
+                            <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+                            <span>Reporte Inventario</span>
+                        </a>
+
+                        <a href="reportes/ventas_encabezado.php" class="admin-btn-card">
+                            <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+                            <span>Reporte Ventas</span>
+                        </a>
+    
+                    </div>
                 </div>
 
             <?php endif; // Fin del bloque admin ?>
 
-        </div>
+        
     </div>
 
 </body>
