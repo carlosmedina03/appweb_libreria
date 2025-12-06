@@ -38,21 +38,32 @@ if (isset($mysqli)) {
   </head>
 
   <body>
-<div class="navbar">
+    <div class="navbar">
         
         <div class="navbar-logo">
             <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
         </div>
 
         <div class="navbar-menu">
-            <a href="dashboard.php">Inicio</a>
-            <a href="ventas.php">Punto de Venta</a>
+
+            <div class="dropdown">
+                <button class="dropbtn">Cajero ▾</button>
+                <div class="dropdown-content">
+                    <a href="dashboard.php">Inicio</a>
+                    <a href="ventas.php">Punto de Venta</a>
+                    <a href="devoluciones.php">Devoluciones</a>
+                </div>
+            </div>
             
             <?php if (isset($_SESSION['user']['rol']) && $_SESSION['user']['rol'] === 'admin'): ?>
-                <a href="productos.php">Productos</a>
-                <a href="compras.php">Compras</a>
-                <a href="devoluciones.php">Devoluciones</a>
-                <a href="usuarios.php">Usuarios</a>
+                <div class="dropdown">
+                    <button class="dropbtn">Gestion ▾</button>
+                    <div class="dropdown-content">
+                        <a href="productos.php">Productos</a>
+                        <a href="compras.php">Compras</a>
+                        <a href="usuarios.php">Usuarios</a>
+                    </div>
+                </div>
 
                 <div class="dropdown">
                     <button class="dropbtn">Reportes ▾</button>
@@ -62,11 +73,9 @@ if (isset($mysqli)) {
                         <a href="reportes/inventario.php">Reportes Inventario</a>
                         <a href="reportes/ventas_detalle.php">Reportes Detalle</a>
                         <a href="reportes/ventas_encabezado.php">Reportes Encabezado</a>
-                    </div>
+                    </div>  
                 </div>
-
-            <?php else: ?>
-                <a href="devoluciones.php">Devoluciones</a>
+                
             <?php endif; ?>
             
             <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>

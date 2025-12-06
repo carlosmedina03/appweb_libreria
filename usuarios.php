@@ -88,21 +88,32 @@ while ($row = $resultado->fetch_assoc()) {
   </head>
 
   <body>
-<div class="navbar">
+    <div class="navbar">
         
         <div class="navbar-logo">
             <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
         </div>
 
         <div class="navbar-menu">
-            <a href="dashboard.php">Inicio</a>
-            <a href="ventas.php">Punto de Venta</a>
+
+            <div class="dropdown">
+                <button class="dropbtn">Cajero ▾</button>
+                <div class="dropdown-content">
+                    <a href="dashboard.php">Inicio</a>
+                    <a href="ventas.php">Punto de Venta</a>
+                    <a href="devoluciones.php">Devoluciones</a>
+                </div>
+            </div>
             
             <?php if (isset($_SESSION['user']['rol']) && $_SESSION['user']['rol'] === 'admin'): ?>
-                <a href="productos.php">Productos</a>
-                <a href="compras.php">Compras</a>
-                <a href="devoluciones.php">Devoluciones</a>
-                <a href="usuarios.php">Usuarios</a>
+                <div class="dropdown">
+                    <button class="dropbtn">Gestion ▾</button>
+                    <div class="dropdown-content">
+                        <a href="productos.php">Productos</a>
+                        <a href="compras.php">Compras</a>
+                        <a href="usuarios.php">Usuarios</a>
+                    </div>
+                </div>
 
                 <div class="dropdown">
                     <button class="dropbtn">Reportes ▾</button>
@@ -112,60 +123,19 @@ while ($row = $resultado->fetch_assoc()) {
                         <a href="reportes/inventario.php">Reportes Inventario</a>
                         <a href="reportes/ventas_detalle.php">Reportes Detalle</a>
                         <a href="reportes/ventas_encabezado.php">Reportes Encabezado</a>
-                    </div>
+                    </div>  
                 </div>
-
-            <?php else: ?>
-                <a href="devoluciones.php">Devoluciones</a>
+                
             <?php endif; ?>
             
             <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
         </div>
+
     </div>
 
     <div class="container main-content">
         <div class="flex-between mb-15">
             <h2>Administración de Usuarios</h2>
-        </div>
-
-        <?php if (!empty($mensaje)): ?>
-            <div style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center;">
-                <?php echo htmlspecialchars($mensaje); ?>
-            </div>
-        <?php endif; ?>
-        <?php if (!empty($error)): ?>
-            <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center;">
-                <?php echo htmlspecialchars($error); ?>
-            </div>
-        <?php endif; ?>
-
-        <div class="form-container">
-            <h3>+ Nuevo Usuario</h3>
-            <form method="POST" action="usuarios.php">
-                <input type="hidden" name="action" value="crear">
-                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <label>Nombre Completo</label>
-                        <input type="text" name="nombre_completo" required style="width: 100%; padding: 8px;" placeholder="Ej: Juan Pérez">
-                    </div>
-                    <div>
-                        <label>Rol</label>
-                        <select name="rol" style="width: 100%; padding: 8px;">
-                            <option value="operador">Operador (Vendedor)</option>
-                            <option value="admin">Administrador</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Usuario (Login)</label>
-                        <input type="text" name="username" required style="width: 100%; padding: 8px;" autocomplete="off">
-                    </div>
-                    <div>
-                        <label>Contraseña</label>
-                        <input type="password" name="password" required style="width: 100%; padding: 8px;" autocomplete="new-password">
-                    </div>
-                </div>
-                <button type="submit" class="btn" style="margin-top: 15px;">Crear Usuario</button>
-            </form>
         </div>
 
         <div class="card">

@@ -19,30 +19,48 @@ $usuario_gen = 'Administrador'; // Placeholder for static version
 
 <body>
     <div class="navbar">
+        
         <div class="navbar-logo">
-            <img src="../assets/img/logo-maria-de-letras_v2.svg" alt="Logo de María de Letras">
+            <img src="../assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
         </div>
+
         <div class="navbar-menu">
-            <a href="../dashboard.php">Inicio</a>
-            <a href="../ventas.php">Punto de ventas</a>
-            <a href="../productos.php">Productos</a>
-            <a href="../compras.php">Compras</a>
-            <a href="../devoluciones.php">Devoluciones</a>
-            <a href="../usuarios.php">Usuario</a>
 
             <div class="dropdown">
-                <button class="dropbtn">Reportes ▾</button>
+                <button class="dropbtn">Cajero ▾</button>
                 <div class="dropdown-content">
-                    <a href="compras.php">Reportes Compra</a>
-                    <a href="devoluciones.php">Reportes Devoluciones</a>
-                    <a href="inventario.php">Reportes Inventario</a>
-                    <a href="ventas_detalle.php">Reportes Detalle</a>
-                    <a href="ventas_encabezado.php">Reportes Encabezado</a>
+                    <a href="../dashboard.php">Inicio</a>
+                    <a href="../ventas.php">Punto de Venta</a>
+                    <a href="../devoluciones.php">Devoluciones</a>
                 </div>
             </div>
+            
+            <?php if (isset($_SESSION['user']['rol']) && $_SESSION['user']['rol'] === 'admin'): ?>
+                <div class="dropdown">
+                    <button class="dropbtn">Gestion ▾</button>
+                    <div class="dropdown-content">
+                        <a href="../productos.php">Productos</a>
+                        <a href="../compras.php">Compras</a>
+                        <a href="../usuarios.php">Usuarios</a>
+                    </div>
+                </div>
 
-            <a href="../includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+                <div class="dropdown">
+                    <button class="dropbtn">Reportes ▾</button>
+                    <div class="dropdown-content">
+                        <a href="compras.php">Reportes Compra</a>
+                        <a href="devoluciones.php">Reportes Devoluciones</a>
+                        <a href="inventario.php">Reportes Inventario</a>
+                        <a href="ventas_detalle.php">Reportes Detalle</a>
+                        <a href="ventas_encabezado.php">Reportes Encabezado</a>
+                    </div>  
+                </div>
+                
+            <?php endif; ?>
+            
+            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
         </div>
+
     </div>
 
     <div class="container main-content-large">

@@ -27,6 +27,7 @@ while ($row = $res->fetch_assoc()) {
     $total_comprado += $row['total_compra'];
     $compras[] = $row;
 }
+
 ?>
 
 <?php
@@ -67,6 +68,9 @@ ob_start();
             </button>
             <button type="button" class="btn w-150" onclick="window.print()">
                 Imprimir / PDF
+            </button>
+            <button type="button" class="btn w-150">
+                Exportar CSV
             </button>
         </div>
     </form>

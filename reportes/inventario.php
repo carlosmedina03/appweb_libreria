@@ -77,6 +77,9 @@ ob_start();
             <button type="button" class="btn w-150" onclick="window.print()">
                 Imprimir / PDF
             </button>
+            <button type="button" class="btn w-150">
+                Exportar CSV
+            </button>
         </div>
     </form>
 </div>

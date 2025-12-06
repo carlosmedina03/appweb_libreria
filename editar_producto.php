@@ -87,21 +87,51 @@ if ($resultado && $resultado->num_rows > 0) {
 
   <body>
     <div class="navbar">
+        
         <div class="navbar-logo">
             <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
         </div>
+
         <div class="navbar-menu">
-            <a href="dashboard.php">Inicio</a>
-            <a href="ventas.php">Punto de Venta</a>
-            <a href="productos.php">Productos</a>
-            <a href="compras.php">Compras</a>
-            <a href="devoluciones.php">Devoluciones</a>
-            <a href="usuarios.php">Usuarios</a>
+
+            <div class="dropdown">
+                <button class="dropbtn">Cajero ▾</button>
+                <div class="dropdown-content">
+                    <a href="dashboard.php">Inicio</a>
+                    <a href="ventas.php">Punto de Venta</a>
+                    <a href="devoluciones.php">Devoluciones</a>
+                </div>
+            </div>
+            
+            <?php if (isset($_SESSION['user']['rol']) && $_SESSION['user']['rol'] === 'admin'): ?>
+                <div class="dropdown">
+                    <button class="dropbtn">Gestion ▾</button>
+                    <div class="dropdown-content">
+                        <a href="productos.php">Productos</a>
+                        <a href="compras.php">Compras</a>
+                        <a href="usuarios.php">Usuarios</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="dropbtn">Reportes ▾</button>
+                    <div class="dropdown-content">
+                        <a href="reportes/compras.php">Reportes Compra</a>
+                        <a href="reportes/devoluciones.php">Reportes Devoluciones</a>
+                        <a href="reportes/inventario.php">Reportes Inventario</a>
+                        <a href="reportes/ventas_detalle.php">Reportes Detalle</a>
+                        <a href="reportes/ventas_encabezado.php">Reportes Encabezado</a>
+                    </div>  
+                </div>
+                
+            <?php endif; ?>
+            
             <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
         </div>
+
     </div>
 
-    <div class="container main-content-large" style="margin-top: 20px;">
+    <div class="container main-content-large">
         <div class="flex-between mb-15">
             <h2>Editando Producto: "<?php echo htmlspecialchars($producto['titulo']); ?>"</h2>
             <a href="productos.php" class="btn" style="background-color: #555;">Volver al Listado</a>
@@ -127,6 +157,7 @@ if ($resultado && $resultado->num_rows > 0) {
                         <br><br>
                         <label for="titulo">Título del Libro</label><br>
                         <input type="text" id="titulo" name="titulo" required value="<?php echo htmlspecialchars($producto['titulo']); ?>" style="width: 100%; padding: 8px;">
+                    
                     </div>
                     <div>
                         <label for="precio">Precio de Venta</label><br>
