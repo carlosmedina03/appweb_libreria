@@ -22,16 +22,15 @@ $rol = $usuario['rol'];
 <body>
 
 <header>
-    <div class="navbar">
-        <div class="navbar-logo">
+<div class="navbar dashboard-navbar"> <div class="navbar-logo">
             <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
         </div>
-        <div class="navbar-menu">
-            <span>Hola, <strong><?php echo htmlspecialchars($nombre_usuario); ?></strong> (<?php echo ucfirst($rol); ?>)</span>
+        
+        <div class="navbar-user-info">
+            <span class="user-text">Hola, <strong><?php echo htmlspecialchars($nombre_usuario); ?></strong> (<?php echo ucfirst($rol); ?>)</span>
             <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
         </div>
     </div>
-
 </header>
 
     <div class="container-dashboard">
@@ -99,5 +98,6 @@ $rol = $usuario['rol'];
         
     </div>
 
+    <script src="js/main.js"></script>
 </body>
 </html>

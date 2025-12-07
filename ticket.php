@@ -71,10 +71,11 @@ if ($tipo === 'devolucion') {
  * @param int $anchoTotal El número total de caracteres del ticket (aprox. 40-48 para 80mm).
  * @return string El texto de la línea formateado.
  */
-function imprimir_linea($nombre, $cantidad, $precio, $importe, $anchoTotal = 42) {
-    $anchoPrecio = 9; // Ancho para el importe
-    $anchoCantidad = 4; // Ancho para la cantidad
-    $anchoNombre = $anchoTotal - $anchoPrecio - $anchoCantidad;
+function imprimir_linea($nombre, $cantidad, $precio, $importe, $anchoTotal = 48) {
+    $anchoPrecio = 11; // Ancho para el importe
+    $anchoCantidad = 5; // Ancho para la cantidad
+    $espacioEntreCols = ""; // Espacio entre columnas
+    $anchoNombre = $anchoTotal - $anchoPrecio - $anchoCantidad - 3;
 
     // Formatear datos
     $cantidadStr = str_pad($cantidad, $anchoCantidad, " ", STR_PAD_LEFT);
@@ -84,7 +85,7 @@ function imprimir_linea($nombre, $cantidad, $precio, $importe, $anchoTotal = 42)
     $lineasNombre = wordwrap($nombre, $anchoNombre, "\n", true);
     $lineas = explode("\n", $lineasNombre);
 
-    $lineaPrincipal = str_pad($lineas[0], $anchoNombre) . $cantidadStr . $importeStr;
+    $lineaPrincipal = str_pad($lineas[0], $anchoNombre) .  $espacioEntreCols . $cantidadStr . $espacioEntreCols . $importeStr;
 
     // Si el nombre ocupa más de una línea
     if (count($lineas) > 1) {
@@ -105,12 +106,13 @@ function imprimir_linea($nombre, $cantidad, $precio, $importe, $anchoTotal = 42)
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo $titulo_ticket; ?> #<?php echo $folio; ?></title>
     <link rel="stylesheet" href="css/ticket.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
   </head>
   
   <body>
     <div class="ticket">
       <div style="text-align: center;">
-        <img src="img.php?tipo=logo" alt="Logo" style="max-width: 160px; max-height: 80px; margin-bottom: 5px;">
+        <img src="img.php?tipo=logo" alt="Logo" style="width: 250px; max-width: 90%; height: auto; margin-bottom: 10px;">
         <h1 style="font-size: 12pt; margin: 0;"><?php echo htmlspecialchars($negocio['razon_social']); ?></h1>
         <p style="margin: 2px 0; font-size: 7.5pt;">
           <?php echo htmlspecialchars($negocio['domicilio']); ?>
@@ -164,12 +166,29 @@ function imprimir_linea($nombre, $cantidad, $precio, $importe, $anchoTotal = 42)
         <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
         <p style="margin: 0;"><?php echo htmlspecialchars($negocio['mensaje_ticket'] ?? '¡Gracias por su compra!'); ?></p>
         <p style="margin: 2px 0 0 0;">(Powered by Sistema MDL)</p>
+
+        <div style="margin-top: 10px;">
+          <svg id="codigoBarrasTicket"></svg>
+        </div>
+
       </div>
 
       <div class="no-print" style="text-align: center; margin-top: 20px;">
           <button onclick="window.close()" class="btn" style="width: 80%; background: #555;">Cerrar Ticket</button>
       </div>
     </div>
+
+    <script>
+        JsBarcode("#codigoBarrasTicket", "<?php echo str_pad($folio, 8, '0', STR_PAD_LEFT); ?>", {
+            format: "CODE128", // este formato lee números y letras, sirve para folios
+            lineColor: "#000",
+            width: 2,          
+            height: 40,        
+            displayValue: true,
+            fontSize: 14,
+            margin: 5
+        });
+    </script>
 
     <script>
         window.addEventListener('load', function() {

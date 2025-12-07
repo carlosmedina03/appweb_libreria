@@ -44,7 +44,13 @@ if (isset($mysqli)) {
             <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
         </div>
 
-        <div class="navbar-menu">
+        <button class="menu-toggle" id="mobile-menu-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="navbar-menu" id="navbar-menu">
 
             <div class="dropdown">
                 <button class="dropbtn">Cajero ▾</button>
@@ -75,7 +81,6 @@ if (isset($mysqli)) {
                         <a href="reportes/ventas_encabezado.php">Reportes Encabezado</a>
                     </div>  
                 </div>
-                
             <?php endif; ?>
             
             <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>

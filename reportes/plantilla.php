@@ -14,17 +14,24 @@ $usuario_gen = 'Administrador'; // Placeholder for static version
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>María de letras | Reportes</title>
-    <link rel="stylesheet" href="../css/styles.css"> 
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../assets/img/logo-maria-de-letras_icon.svg">
     </head>
 
 <body>
-    <div class="navbar">
+<div class="navbar">
         
         <div class="navbar-logo">
             <img src="../assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
         </div>
 
-        <div class="navbar-menu">
+        <button class="menu-toggle" id="mobile-menu-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="navbar-menu" id="navbar-menu">
 
             <div class="dropdown">
                 <button class="dropbtn">Cajero ▾</button>
@@ -55,13 +62,13 @@ $usuario_gen = 'Administrador'; // Placeholder for static version
                         <a href="ventas_encabezado.php">Reportes Encabezado</a>
                     </div>  
                 </div>
-                
             <?php endif; ?>
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="../includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
         </div>
-
     </div>
+
+ 
 
     <div class="container main-content-large">
         <div class="report-header">
@@ -80,6 +87,8 @@ $usuario_gen = 'Administrador'; // Placeholder for static version
             <p style="margin: 0;">Página 1 de 1</p> 
         </div>
 
-    </div>
+    </div>   
+    
+    <script src="../js/main.js"></script>
 </body>
 </html>

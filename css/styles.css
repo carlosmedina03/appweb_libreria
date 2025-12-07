@@ -334,6 +334,46 @@
     background: #A72115;
   }
 
+  .btn, button {
+    margin-right: 15px;  /* Espacio a la derecha */
+    margin-bottom: 10px; /* Espacio abajo para celulares */
+  }
+
+/* =========================================
+   BOTONES DE ACCIÓN (TABLAS)
+   Agregado para productos.php
+========================================= */
+
+.btn-sm {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #fff !important; /* Texto blanco siempre */
+    transition: background 0.2s, transform 0.1s;
+    border: none;
+    margin: 0 2px; /* Separación entre botones */
+    cursor: pointer;
+}
+
+.btn-edit {
+    background-color: #007bff; 
+}
+.btn-edit:hover {
+    background-color: #0056b3; 
+    transform: translateY(-1px);
+}
+
+.btn-delete {
+    background-color: #dc3545; 
+}
+.btn-delete:hover {
+    background-color: #a71d2a; 
+    transform: translateY(-1px);
+}
+
 
   /* ==========================
     NAVBAR (para index, compras, devoluciones)
@@ -449,66 +489,7 @@
   }
 
 
-  /* ==========================
-
-    RESPONSIVE
-
-  ========================== */
-
-  @media (max-width: 480px) {
-
-    .container {
-      padding: 16px;
-      border-radius: 6px;
-    }
-
-    .logo img {
-      width: 160px;
-    }
-
-    .navbar {
-      flex-direction: column;
-      text-align: center;
-      height: auto;
-      padding: 10px;
-    }
-
-    .navbar-menu {
-      margin-top: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .navbar-menu a {
-      margin-left: 0;
-    }
-
-    .grid-2 {
-      grid-template-columns: 1fr;
-    }
-  }
-
-
-  @media (max-width: 768px) {
-    .admin-grid-actions {
-      grid-template-columns: 1fr;
-    }
-
-    .admin-grid-actions>a:last-child {
-      grid-column: span 1;
-    }
-  }
-
-  @media (max-width: 600px) {
-    .admin-grid-actions {
-      grid-template-columns: 1fr;
-    }
-
-    .admin-grid-actions>a:last-child {
-      grid-column: span 1;
-    }
-  }
+  
 
 
 
@@ -626,16 +607,16 @@
 
 
 
-  /* =========================================
+ /* =========================================
    ESTILOS PARA MENÚ DESPLEGABLE (DROPDOWN)
 ========================================= */
 
-  .dropdown {
+.dropdown {
     position: relative;
     display: inline-block;
-  }
+}
 
-  .dropbtn {
+.dropbtn {
     background-color: transparent;
     color: #C82B1D;
     padding: 10px 16px;
@@ -644,9 +625,9 @@
     cursor: pointer;
     font-weight: bold;
     font-family: inherit;
-  }
+}
 
-  .dropdown-content {
+.dropdown-content {
     display: none;
     position: absolute;
     background-color: #ffffff;
@@ -655,9 +636,9 @@
     z-index: 1000;
     border-radius: 5px;
     border-top: 3px solid #C82B1D;
-  }
+}
 
-  .dropdown-content a {
+.dropdown-content a {
     color: #333;
     padding: 12px 16px;
     text-decoration: none;
@@ -666,17 +647,336 @@
     margin-left: 0;
     font-size: 14px;
     transition: background 0.2s;
-  }
+}
 
-  .dropdown-content a:hover {
+.dropdown-content a:hover {
     background-color: #f1f1f1;
     color: #C82B1D;
-  }
+}
 
-  .dropdown:hover .dropdown-content {
+@media (min-width: 769px) {
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    .dropdown:hover .dropbtn {
+        color: #9F0A1F;
+    }
+}
+  
+
+  /* =========================================
+   ESTILOS RESPONSIVE (MENÚ HAMBURGUESA)
+  ========================================= */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1100;
+}
+
+.menu-toggle span {
     display: block;
+    width: 100%;
+    height: 3px;
+    background-color: #C82B1D;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+/* Media Query para Celulares y Tablets (Menor a 768px) */
+@media (max-width: 768px) {
+    
+    /* Mostrar el botón hamburguesa */
+    .menu-toggle {
+        display: flex;
+    }
+
+    /* Ocultar el menú normal y prepararlo para deslizar o aparecer */
+    .navbar-menu {
+        display: none;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        border-top: 1px solid #eee;
+    }
+
+    /* Clase que agrega JS para mostrar el menú */
+    .navbar-menu.active {
+        display: flex;
+        animation: slideDown 0.3s ease forwards;
+    }
+
+    /* Estilo de los enlaces en móvil */
+    .navbar-menu a {
+        margin: 10px 0;
+        font-size: 18px;
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* AJUSTE DE DROPDOWNS EN MÓVIL */
+    .dropdown {
+        width: 100%;
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .dropbtn {
+        width: 100%;
+        font-size: 18px;
+        padding: 10px;
+    }
+
+    .dropdown-content {
+        position: relative;
+        box-shadow: none;
+        border-top: none;
+        background-color: #f9f9f9;
+        width: 100%;
+    }
+    
+    .dropdown-content a {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Solo mostramos el menú si el JavaScript le puso la clase show */
+    .dropdown-content.show {
+        display: block !important;
+        position: relative;
+        width: 100%;
+        background-color: #f9f9f9;
+        box-shadow: none;
+        animation: slideDown 0.3s ease forwards;
+    }
+
+    .cerrar-sesion {
+        width: 80%;
+        margin-top: 15px;
+        text-align: center;
+        display: inline-block;
+    }
   }
 
-  .dropdown:hover .dropbtn {
-    color: #9F0A1F;
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* =========================================
+    ESTILOS PARA REPORTES IMPRESOS
+========================================= */
+
+/* SEPARACIÓN DE BOTONES */
+.btn, button {
+    margin-right: 15px;  
+    margin-bottom: 10px;
+}
+
+/* ENCABEZADO DE REPORTE */
+.report-header {
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.report-title {
+    text-align: center;
+    margin: 0;
+    flex-grow: 1;
+    font-size: 1.8em;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.report-meta {
+    text-align: right;
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* PIE DE PÁGINA DE REPORTE */
+.report-footer {
+    border-top: 1px solid #ddd;
+    padding-top: 15px;
+    margin-top: 40px;
+    font-size: 0.85em;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ESTILOS DE TABLA EN REPORTES */
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+/* Encabezado de tabla más oscuro */
+table th {
+    background-color: #eee;
+    color: #000;
+    font-weight: bold;
+}
+
+/* =========================================
+   ESTILOS DASHBOARD MÓVIL (TIPO ESCRITORIO)
+========================================= */
+
+/* Estilos para la información del usuario (Texto y Botón) */
+.navbar-user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-text {
+    font-size: 14px;
+    color: #333;
+}
+
+@media (max-width: 768px) {
+    
+    .dashboard-navbar {
+        flex-direction: row !important;   
+        justify-content: space-between !important; 
+        align-items: center;                
+        height: 70px !important;           
+        padding: 0 10px;               
+        gap: 10px;
+    }
+
+    .dashboard-navbar .navbar-logo {
+        flex-shrink: 0;
+    }
+    
+    .dashboard-navbar .navbar-logo img {
+        height: 30px;
+        margin: 0;
+    }
+
+    #navbar-menu {
+        display: none;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        border-top: 1px solid #eee;
+        z-index: 9999;
+    }
+
+    #navbar-menu.active {
+        display: flex !important; 
+        animation: slideDown 0.3s ease forwards;
+    }
+
+    .navbar-user-info {
+        display: flex;
+        flex-direction: column; 
+        align-items: flex-end;  
+        justify-content: center;
+        gap: 4px; 
+        width: auto;
+        margin: 0;
+    }
+
+    .user-text {
+        font-size: 11px; 
+        text-align: right;
+        line-height: 1.2;
+        max-width: 200px; 
+        white-space: nowrap; 
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .dashboard-navbar .cerrar-sesion {
+        font-size: 11px;
+        padding: 8px 10px;
+        width: auto;
+    }
+}
+
+
+
+/* ==========================
+
+    RESPONSIVE
+
+  ========================== */
+
+  @media (max-width: 480px) {
+
+    .container {
+      padding: 16px;
+      border-radius: 6px;
+    }
+
+    .logo img {
+      width: 160px;
+    }
+
+    .navbar {
+      flex-direction: column;
+      text-align: center;
+      height: auto;
+      padding: 10px;
+    }
+
+    .navbar-menu {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .navbar-menu a {
+      margin-left: 0;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+
+  @media (max-width: 768px) {
+    .admin-grid-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-grid-actions>a:last-child {
+      grid-column: span 1;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .admin-grid-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-grid-actions>a:last-child {
+      grid-column: span 1;
+    }
   }

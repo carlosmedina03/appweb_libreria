@@ -109,7 +109,13 @@ $productos = $mysqli->query($sql_productos);
             <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
         </div>
 
-        <div class="navbar-menu">
+        <button class="menu-toggle" id="mobile-menu-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="navbar-menu" id="navbar-menu">
 
             <div class="dropdown">
                 <button class="dropbtn">Cajero ▾</button>
@@ -140,7 +146,6 @@ $productos = $mysqli->query($sql_productos);
                         <a href="reportes/ventas_encabezado.php">Reportes Encabezado</a>
                     </div>  
                 </div>
-                
             <?php endif; ?>
             
             <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
@@ -210,9 +215,16 @@ $productos = $mysqli->query($sql_productos);
                                 <td><?php echo htmlspecialchars($producto['titulo']); ?></td>
                                 <td>$<?php echo number_format($producto['precio_venta'], 2); ?></td>
                                 <td><?php echo $producto['cantidad'] ?? 0; ?></td>
-                                <td>
-                                    <a href="editar_producto.php?id=<?php echo $producto['id']; ?>" class="text-blue">Editar</a> | 
-                                    <a href="productos.php?action=desactivar&id=<?php echo $producto['id']; ?>" onclick="return confirm('¿Estás seguro de que quieres desactivar este producto? No aparecerá en ventas.');" style="color: red;">Desactivar</a>
+                                <td style="text-align: center; white-space: nowrap;">
+                                    <a href="editar_producto.php?id=<?php echo $producto['id']; ?>" class="btn-sm btn-edit">
+                                            Editar
+                                    </a>
+        
+                                    <a href="productos.php?action=desactivar&id=<?php echo $producto['id']; ?>" 
+                                        class="btn-sm btn-delete"
+                                         onclick="return confirm('¿Estás seguro de que quieres desactivar este producto? No aparecerá en ventas.');">
+                                             Desactivar
+                                    </a>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -228,5 +240,7 @@ $productos = $mysqli->query($sql_productos);
         </div>
     </div>
     
+
+    <script src="js/main.js"></script>
   </body>
 </html>
