@@ -1,6 +1,6 @@
 <?php
 // ============================================================
-// RESPONSABLE: Rol 2 (Diseño) y Rol 4 (Datos)
+// RESPONSABLE: Vista de Reporte Detallado de Ventas con filtros.
 // REQUERIMIENTO: "3.3 Detalle de ventas... Columnas: Fecha, Folio, Código..."
 // ============================================================
 // 1. Ejecutar Query 5 de consultas_base.sql.
@@ -12,17 +12,30 @@
 require_once '../config/db.php';
 require_once '../includes/security_guardr.php';
 
-$fecha_ini = $_GET['inicio'] ?? date('Y-m-01 00:00:00');
-$fecha_fin = $_GET['fin'] ?? date('Y-m-t 23:59:59');
+// Variables de filtro para retener el valor en el input
+$fecha_ini_input = $_GET['inicio'] ?? date('Y-m-01');
+$fecha_fin_input = $_GET['fin'] ?? date('Y-m-d');
+$filtro_producto = isset($_GET['producto']) ? $mysqli->real_escape_string($_GET['producto']) : ''; 
+
+// Se ajusta para usar el formato de base de datos en el SQL
+$fecha_ini_db = $fecha_ini_input . ' 00:00:00';
+$fecha_fin_db = $fecha_fin_input . ' 23:59:59';
+
 
 // Query (Basado en Consultas Base 3.3)
 $sql = "SELECT v.fecha_hora, v.id as folio, l.codigo, l.titulo as nombre, 
-               dv.cantidad, dv.precio_unitario, dv.importe as importe_linea
+                dv.cantidad, dv.precio_unitario, dv.importe as importe_linea
         FROM detalle_ventas dv
         JOIN ventas v ON dv.id_venta = v.id
         JOIN libros l ON dv.id_libro = l.id
-        WHERE v.fecha_hora BETWEEN '$fecha_ini' AND '$fecha_fin'
-        ORDER BY v.fecha_hora DESC";
+        WHERE v.fecha_hora BETWEEN '$fecha_ini_db' AND '$fecha_fin_db'"; 
+
+if ($filtro_producto != '') {
+    $sql .= " AND (l.titulo LIKE '%$filtro_producto%' OR l.codigo LIKE '%$filtro_producto%')";
+}
+
+$sql .= " ORDER BY v.fecha_hora DESC";
+
 
 $resultado = $mysqli->query($sql);
 
@@ -49,38 +62,46 @@ ob_start();
             <div class="filter-group">
                 <label for="inicio">Fecha Inicio</label>
                 <input type="date" id="inicio" name="inicio" required 
-                       value="2025-12-01" 
+                       value="<?php echo htmlspecialchars($fecha_ini_input); ?>" 
                        class="filter-input">
             </div>
             
             <div class="filter-group">
                 <label for="fin">Fecha Fin</label>
                 <input type="date" id="fin" name="fin" required 
-                       value="2025-12-01" 
+                       value="<?php echo htmlspecialchars($fecha_fin_input); ?>" 
                        class="filter-input">
             </div>
 
             <div class="filter-group-large">
                 <label for="producto">Producto (Opcional)</label>
-                <input type="text" id="producto" name="producto" placeholder="Nombre del libro..." class="filter-input">
+                <input type="text" id="producto" name="producto" placeholder="Nombre o Código del libro..." class="filter-input"
+                       value="<?php echo htmlspecialchars($filtro_producto); ?>">
             </div>
             
-            <button type="button" class="btn w-150">
+            <button type="submit" class="btn w-150">
                 Generar Reporte
             </button>
             <button type="button" class="btn w-150" onclick="window.print()">
                 Imprimir / PDF
             </button>
-            <button type="button" class="btn w-150">
+            <?php 
+            // Esto llama a tu archivo exportar.php terminado
+            $csv_url = '../reportes/exportar.php?tipo=detalle_ventas' . 
+                       '&inicio=' . urlencode($fecha_ini_input) . 
+                       '&fin=' . urlencode($fecha_fin_input) .
+                       '&producto=' . urlencode($filtro_producto);
+            ?>
+            <a href="<?php echo $csv_url; ?>" class="btn w-150">
                 Exportar CSV
-            </button>
+            </a>
         </div>
     </form>
 </div>
 
 <div class="card">
     <p class="font-bold text-sm">
-        Mostrando detalle del día 01/12/2025
+        Mostrando **<?php echo count($detalles); ?>** líneas de detalle.
     </p>
     
     <table>
@@ -95,51 +116,38 @@ ob_start();
             </tr>
         </thead>
         <tbody>
-            <!-- Venta 1001 -->
-            <tr> 
-                <td>1001</td>
-                <td>01/12/2025 10:30:00</td>
-                <td>Cien Años de Soledad</td>
-                <td class="text-center">1</td>
-                <td class="text-right">$250.00</td>
-                <td class="text-right">$250.00</td>
-            </tr>
-            
-            <!-- Venta 1002 -->
-            <tr> 
-                <td>1002</td>
-                <td>01/12/2025 11:15:00</td>
-                <td>El Principito</td>
-                <td class="text-center">2</td>
-                <td class="text-right">$150.00</td>
-                <td class="text-right">$300.00</td>
-            </tr>
-
-            <!-- Venta 1003 -->
-            <tr> 
-                <td>1003</td>
-                <td>02/12/2025 09:45:00</td>
-                <td>Rayuela</td>
-                <td class="text-center">1</td>
-                <td class="text-right">$200.00</td>
-                <td class="text-right">$200.00</td>
-            </tr>
+            <?php if (count($detalles) > 0): ?>
+                <?php foreach ($detalles as $detalle): ?>
+                <tr> 
+                    <td><?php echo htmlspecialchars($detalle['folio']); ?></td>
+                    <td><?php echo date('d/m/Y H:i:s', strtotime($detalle['fecha_hora'])); ?></td>
+                    <td><?php echo htmlspecialchars($detalle['nombre']); ?></td>
+                    <td class="text-center"><?php echo number_format($detalle['cantidad'], 0); ?></td>
+                    <td class="text-right">$<?php echo number_format($detalle['precio_unitario'], 2); ?></td>
+                    <td class="text-right">$<?php echo number_format($detalle['importe_linea'], 2); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="6" class="text-center">No se encontraron detalles de venta con los filtros aplicados.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
         <tfoot>
             <tr>
                 <td colspan="5" class="text-right font-bold bg-light-green">
-                    TOTAL VENTAS
+                    **TOTAL IMPORTE (LÍNEAS)**
                 </td>
                 <td class="text-right font-bold bg-light-green">
-                    $750.00
+                    $<?php echo number_format($suma_importe, 2); ?>
                 </td>
             </tr>
             <tr>
                 <td colspan="5" class="text-right font-bold bg-light-gray">
-                    TOTAL UNIDADES VENDIDAS
+                    **TOTAL UNIDADES VENDIDAS**
                 </td>
                 <td class="text-right font-bold bg-light-gray">
-                    4
+                    <?php echo number_format($suma_unidades, 0); ?>
                 </td>
             </tr>
         </tfoot>

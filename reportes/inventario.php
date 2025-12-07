@@ -1,21 +1,16 @@
 <?php
 // ============================================================
-// RESPONSABLE: Rol 2 (Maquetación A4) y Rol 4 (Datos)
+// RESPONSABLE: Vista de Reporte de Inventario con filtros.
 // REQUERIMIENTO: "Reporte 3.1 Inventario actual... Filtros: q, solo activos"
 // ============================================================
-// 1. Usar Query 3 de consultas_base.sql.
-// 2. Mostrar tabla con encabezados que resalten y líneas zebra.
-// 3. Numeración de página en pie.
-
-// BACKEND ABAJO (NO BORRAR)
-// REQUERIMIENTO: "Filtros obligatorios: q (código/nombre), solo activos"
-// ---------------------------------------------------------
 require_once '../config/db.php';
 require_once '../includes/security_guardr.php';
 
-// 1. Recibir Filtros
+// 1. Recibir Filtros.
 $filtro_q = isset($_GET['q']) ? $mysqli->real_escape_string($_GET['q']) : '';
 $solo_activos = isset($_GET['activos']) ? true : false;
+$filtro_stock = $_GET['stock'] ?? 'todos'; // Stock bajo/agotado (solo visual)
+
 
 // 2. Construir Query (Basado en Consultas Base 3.1)
 $sql = "SELECT l.codigo, l.titulo as nombre, l.precio_venta as precio, e.cantidad as existencia, l.estatus 
@@ -36,16 +31,17 @@ $sql .= " ORDER BY l.titulo";
 $resultado = $mysqli->query($sql);
 $productos = [];
 $total_existencias = 0;
+$valor_total_inventario = 0;
 
 while ($row = $resultado->fetch_assoc()) {
     $row['estado_str'] = ($row['estatus'] == 1) ? 'ACTIVO' : 'INACTIVO';
+    $row['valor_linea'] = $row['existencia'] * $row['precio'];
     $total_existencias += $row['existencia'];
+    $valor_total_inventario += $row['valor_linea'];
     $productos[] = $row;
 }
 
 $total_items = count($productos);
-
-// AHORA EL ROL 2 (UX) USARÁ $productos, $total_items y $total_existencias EN EL HTML   
 ?>
 <?php
 $titulo_reporte = "REPORTE DE INVENTARIO ACTUAL";
@@ -58,35 +54,42 @@ ob_start();
         <div class="filters-container">
             
             <div class="filter-group-large">
-                <label for="busqueda">Buscar Producto</label>
-                <input type="text" id="busqueda" name="busqueda" placeholder="Código o Título..." class="filter-input">
+                <label for="q">Buscar Producto</label>
+                <input type="text" id="q" name="q" placeholder="Código o Título..." class="filter-input"
+                       value="<?php echo htmlspecialchars($filtro_q); ?>">
             </div>
 
             <div class="filter-group">
-                <label for="stock">Estado de Stock</label>
+                <label for="stock">Estado de Stock (Solo visual)</label>
                 <select id="stock" name="stock" class="filter-input">
-                    <option value="todos">Todos</option>
-                    <option value="bajo">Stock Bajo</option>
-                    <option value="agotado">Agotado</option>
+                    <option value="todos" <?php if ($filtro_stock == 'todos') echo 'selected'; ?>>Todos</option>
+                    <option value="bajo" <?php if ($filtro_stock == 'bajo') echo 'selected'; ?>>Stock Bajo</option>
+                    <option value="agotado" <?php if ($filtro_stock == 'agotado') echo 'selected'; ?>>Agotado</option>
                 </select>
             </div>
             
-            <button type="button" class="btn w-150">
+            <button type="submit" class="btn w-150">
                 Filtrar
             </button>
             <button type="button" class="btn w-150" onclick="window.print()">
                 Imprimir / PDF
             </button>
-            <button type="button" class="btn w-150">
+            <?php 
+            // Esto llama a tu archivo exportar.php terminado
+            $csv_url = '../reportes/exportar.php?tipo=inventario' . 
+                       '&q=' . urlencode($filtro_q) . 
+                       '&activos=' . ($solo_activos ? '1' : '0');
+            ?>
+            <a href="<?php echo $csv_url; ?>" class="btn w-150">
                 Exportar CSV
-            </button>
+            </a>
         </div>
     </form>
 </div>
 
 <div class="card">
     <p class="font-bold text-sm">
-        Total de Productos: 3
+        Total de Productos: **<?php echo $total_items; ?>**
     </p>
     
     <table>
@@ -96,31 +99,32 @@ ob_start();
                 <th>Título del Libro</th>
                 <th class="w-120 text-right">Precio Venta</th>
                 <th class="w-100 text-center">Stock Actual</th>
-                <th class="w-150 text-center">Valor Inventario</th>
+                <th class="w-150 text-right">Valor Inventario</th>
             </tr>
         </thead>
         <tbody>
-            <tr> 
-                <td>LIB001</td>
-                <td>Cien Años de Soledad</td>
-                <td class="text-right">$250.00</td>
-                <td class="text-center">15</td>
-                <td class="text-right">$3,750.00</td>
-            </tr>
-            <tr> 
-                <td>LIB002</td>
-                <td>El Principito</td>
-                <td class="text-right">$150.00</td>
-                <td class="text-center font-bold text-danger">3 (Bajo)</td>
-                <td class="text-right">$450.00</td>
-            </tr>
-            <tr> 
-                <td>LIB003</td>
-                <td>Rayuela</td>
-                <td class="text-right">$200.00</td>
-                <td class="text-center">8</td>
-                <td class="text-right">$1,600.00</td>
-            </tr>
+            <?php if (count($productos) > 0): ?>
+                <?php foreach ($productos as $producto): ?>
+                <tr> 
+                    <td><?php echo htmlspecialchars($producto['codigo']); ?></td>
+                    <td><?php echo htmlspecialchars($producto['nombre']); ?></td>
+                    <td class="text-right">$<?php echo number_format($producto['precio'], 2); ?></td>
+                    <td class="text-center">
+                        <?php echo number_format($producto['existencia'], 0); ?>
+                        <?php if ($producto['existencia'] <= 5 && $producto['existencia'] > 0): ?>
+                            <span class="font-bold text-danger">(Bajo)</span>
+                        <?php elseif ($producto['existencia'] == 0): ?>
+                            <span class="font-bold text-danger">(Agotado)</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="text-right">$<?php echo number_format($producto['valor_linea'], 2); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="5" class="text-center">No se encontraron productos con los filtros aplicados.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
         <tfoot>
             <tr>
@@ -128,7 +132,15 @@ ob_start();
                     VALOR TOTAL DEL INVENTARIO
                 </td>
                 <td class="text-right font-bold bg-light-green">
-                    $5,800.00
+                    $<?php echo number_format($valor_total_inventario, 2); ?>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-right font-bold bg-light-gray">
+                    **TOTAL UNIDADES EN STOCK**
+                </td>
+                <td class="text-right font-bold bg-light-gray">
+                    <?php echo number_format($total_existencias, 0); ?>
                 </td>
             </tr>
         </tfoot>

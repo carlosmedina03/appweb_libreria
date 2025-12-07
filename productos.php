@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
             $stmt_desactivar = $mysqli->prepare($sql_desactivar);
             $stmt_desactivar->bind_param("i", $id_desactivar);
             $stmt_desactivar->execute();
-            header("Location: productos.php"); // Redirige para limpiar la URL
+            header("Location: productos.php"); 
             exit;
         } catch (Exception $e) {
             $mensaje = "Error al desactivar el producto: " . $e->getMessage();
@@ -77,19 +77,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     }
 }
 
-// LISTAR PRODUCTOS
-// Si necesitas mostrar stock, usa esto:
+// PROCESAR ACTIVACIÓN DE PRODUCTO
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'activar') {
+    $id_activar = isset($_GET['id']) ? intval($_GET['id']) : 0;
+    if ($id_activar > 0) {
+        try {
+            $sql_activar = "UPDATE libros SET estatus = 1 WHERE id = ?";
+            $stmt_activar = $mysqli->prepare($sql_activar);
+            $stmt_activar->bind_param("i", $id_activar);
+            $stmt_activar->execute();
+            header("Location: productos.php"); 
+            exit;
+        } catch (Exception $e) {
+            $mensaje = "Error al activar el producto: " . $e->getMessage();
+        }
+    }
+}
+
+
+// LISTAR TODOS LOS PRODUCTOS (ELIMINANDO el filtro WHERE estatus = 1)
 $sql_productos = "
     SELECT l.*, COALESCE(e.cantidad, 0) as cantidad 
     FROM libros l 
     LEFT JOIN existencias e ON l.id = e.id_libro 
-    WHERE l.estatus = 1
+    /* ¡AQUÍ ES DONDE SE ELIMINA LA CLÁUSULA WHERE para ver TODOS! */
     ORDER BY l.titulo
 ";
 $productos = $mysqli->query($sql_productos);
-
-// Si el stock ya funciona, déjalo como estaba:
-// $productos = $mysqli->query("SELECT * FROM libros WHERE estatus = 1");
 ?>
 
 <!doctype html>
@@ -144,7 +158,7 @@ $productos = $mysqli->query($sql_productos);
                         <a href="reportes/inventario.php">Reportes Inventario</a>
                         <a href="reportes/ventas_detalle.php">Reportes Detalle</a>
                         <a href="reportes/ventas_encabezado.php">Reportes Encabezado</a>
-                    </div>  
+                    </div>  
                 </div>
             <?php endif; ?>
             
@@ -194,16 +208,16 @@ $productos = $mysqli->query($sql_productos);
         </div>
 
         <div class="card">
-            <h3>Listado Actual</h3>
+            <h3>Listado Completo de Productos</h3>
             <table>
                 <thead>
                     <tr>
                         <th class="col-5">Img.</th>
                         <th class="col-15">Código</th>
-                        <th class="col-35">Título</th>
+                        <th class="col-30">Título</th>
                         <th class="col-10">Precio Venta</th>
                         <th class="col-10">Stock</th>
-                        <th class="col-25">Acciones</th>
+                        <th class="col-10">Estado</th> <th class="col-20">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -215,23 +229,41 @@ $productos = $mysqli->query($sql_productos);
                                 <td><?php echo htmlspecialchars($producto['titulo']); ?></td>
                                 <td>$<?php echo number_format($producto['precio_venta'], 2); ?></td>
                                 <td><?php echo $producto['cantidad'] ?? 0; ?></td>
+                                
+                                <td>
+                                    <?php if ($producto['estatus'] == 1): ?>
+                                        <span style="color: green; font-weight: bold;">ACTIVO</span>
+                                    <?php else: ?>
+                                        <span style="color: red;">INACTIVO</span>
+                                    <?php endif; ?>
+                                </td>
+
                                 <td style="text-align: center; white-space: nowrap;">
                                     <a href="editar_producto.php?id=<?php echo $producto['id']; ?>" class="btn-sm btn-edit">
                                             Editar
                                     </a>
-        
-                                    <a href="productos.php?action=desactivar&id=<?php echo $producto['id']; ?>" 
-                                        class="btn-sm btn-delete"
-                                         onclick="return confirm('¿Estás seguro de que quieres desactivar este producto? No aparecerá en ventas.');">
-                                             Desactivar
-                                    </a>
+    
+                                    <?php if ($producto['estatus'] == 1): ?>
+                                        <a href="productos.php?action=desactivar&id=<?php echo $producto['id']; ?>" 
+                                            class="btn-sm btn-delete"
+                                            onclick="return confirm('¿Estás seguro de que quieres desactivar este producto? No aparecerá en ventas.');">
+                                                Desactivar
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="productos.php?action=activar&id=<?php echo $producto['id']; ?>" 
+                                            class="btn-sm btn-save"
+                                            onclick="return confirm('¿Estás seguro de que quieres activar este producto?');">
+                                                Activar
+                                        </a>
+                                    <?php endif; ?>
+
                                 </td>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" style="text-align: center; color: #777;">
-                                No hay productos registrados
+                            <td colspan="7" style="text-align: center; color: #777;">
+                                No hay productos registrados.
                             </td>
                         </tr>
                     <?php endif; ?>

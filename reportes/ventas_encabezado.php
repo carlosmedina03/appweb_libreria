@@ -1,6 +1,6 @@
 <?php
 // ============================================================
-// RESPONSABLE: Rol 2 (Diseño) y Rol 4 (Datos)
+// RESPONSABLE: Vista de Reporte de Ventas por Encabezado (Tickets) con filtros.
 // REQUERIMIENTO: "3.2 Ventas por rango... Columnas: Folio, Fecha, Cajero..."
 // ============================================================ 
 // 1. Ejecutar Query 4 de consultas_base.sql.
@@ -10,13 +10,19 @@
 // REQUERIMIENTO: "Filtros obligatorios: fecha inicio, fecha fin"
 // REQUERIMIENTO: "Totales al final: Importe facturado, Número tickets, Promedio"
 // ---------------------------------------------------------
+
 require_once '../config/db.php';
 require_once '../includes/security_guardr.php';
 
 // 1. Fechas por defecto (Mes actual si no envían nada)
-$fecha_ini = $_GET['inicio'] ?? date('Y-m-01 00:00:00');
-$fecha_fin = $_GET['fin'] ?? date('Y-m-t 23:59:59');
+$fecha_ini_input = $_GET['inicio'] ?? date('Y-m-01');
+$fecha_fin_input = $_GET['fin'] ?? date('Y-m-d');
 $filtro_cajero = isset($_GET['cajero']) ? intval($_GET['cajero']) : 0;
+
+// Se ajusta para usar el formato de base de datos en el SQL
+$fecha_ini_db = $fecha_ini_input . ' 00:00:00';
+$fecha_fin_db = $fecha_fin_input . ' 23:59:59';
+
 
 // BACKEND: Obtener lista de cajeros para el filtro
 $res_cajeros = $mysqli->query("SELECT id, nombre_completo FROM usuarios WHERE activo = 1 ORDER BY nombre_completo");
@@ -26,11 +32,11 @@ while($row = $res_cajeros->fetch_assoc()) {
 }
 
 
-// 2. Query (Basado en Consultas Base 3.2)
+// 2. Query (Basado en Consultas Base 3.2: Ventas por Encabezado)
 $sql = "SELECT v.id as folio, v.fecha_hora, u.nombre_completo as cajero, v.subtotal, v.iva, v.total 
         FROM ventas v 
         JOIN usuarios u ON v.id_usuario = u.id 
-        WHERE v.fecha_hora BETWEEN '$fecha_ini' AND '$fecha_fin'";
+        WHERE v.fecha_hora BETWEEN '$fecha_ini_db' AND '$fecha_fin_db'"; 
 
 if ($filtro_cajero > 0) {
     $sql .= " AND v.id_usuario = $filtro_cajero";
@@ -42,21 +48,24 @@ $resultado = $mysqli->query($sql);
 
 // 3. Preparar Dataset y Calcular Totales
 $ventas = [];
+$suma_subtotal = 0;
+$suma_iva = 0;
 $suma_total_facturado = 0;
 
 while ($row = $resultado->fetch_assoc()) {
+    $suma_subtotal += $row['subtotal'];
+    $suma_iva += $row['iva'];
     $suma_total_facturado += $row['total'];
     $ventas[] = $row;
 }
 
 $num_tickets = count($ventas);
+// Cálculo del ticket promedio
 $ticket_promedio = ($num_tickets > 0) ? ($suma_total_facturado / $num_tickets) : 0;
-
-// AHORA EL ROL 2 (UX) TIENE TODO LISTO PARA PINTAR LA TABLA
 ?>
 
 <?php
-$titulo_reporte = "REPORTE DE VENTAS POR RANGO";
+$titulo_reporte = "REPORTE DE VENTAS POR ENCABEZADO (TICKETS)";
 ob_start();
 ?>
 
@@ -68,14 +77,14 @@ ob_start();
             <div class="filter-group">
                 <label for="inicio">Fecha Inicio</label>
                 <input type="date" id="inicio" name="inicio" required 
-                       value="2025-12-01" 
+                       value="<?php echo htmlspecialchars($fecha_ini_input); ?>" 
                        class="filter-input">
             </div>
             
             <div class="filter-group">
                 <label for="fin">Fecha Fin</label>
                 <input type="date" id="fin" name="fin" required 
-                       value="2025-12-31" 
+                       value="<?php echo htmlspecialchars($fecha_fin_input); ?>" 
                        class="filter-input">
             </div>
 
@@ -83,28 +92,36 @@ ob_start();
                 <label for="cajero">Cajero (Opcional)</label>
                 <select id="cajero" name="cajero" class="filter-input">
                     <option value="0">--- Todos los Cajeros ---</option>
-                    <option value="1">Juan Pérez</option>
-                    <option value="2">María López</option>
-                    <option value="3">Carlos Ruiz</option>
+                    <?php foreach ($cajeros as $cajero): ?>
+                    <option value="<?php echo $cajero['id']; ?>" <?php if ($cajero['id'] == $filtro_cajero) echo 'selected'; ?>>
+                        <?php echo htmlspecialchars($cajero['nombre_completo']); ?>
+                    </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             
-            <button type="button" class="btn w-150">
+            <button type="submit" class="btn w-150">
                 Generar Reporte
             </button>
             <button type="button" class="btn w-150" onclick="window.print()">
                 Imprimir / PDF
             </button>
-            <button type="button" class="btn w-150">
+            <?php 
+            $csv_url = '../reportes/exportar.php?tipo=ventas' . 
+                       '&inicio=' . urlencode($fecha_ini_input) . 
+                       '&fin=' . urlencode($fecha_fin_input) .
+                       '&cajero=' . urlencode($filtro_cajero);
+            ?>
+            <a href="<?php echo $csv_url; ?>" class="btn w-150">
                 Exportar CSV
-            </button>
+            </a>
         </div>
     </form>
 </div>
 
 <div class="card">
     <p class="font-bold text-sm">
-        Total de Tickets Encontrados: 3
+        Total de Tickets Encontrados: **<?php echo $num_tickets; ?>**
     </p>
     
     <table>
@@ -119,54 +136,46 @@ ob_start();
             </tr>
         </thead>
         <tbody>
-            <tr> 
-                <td>1001</td>
-                <td>01/12/2025 10:30:00</td>
-                <td>Juan Pérez</td>
-                <td class="text-right">$215.52</td>
-                <td class="text-right">$34.48</td>
-                <td class="text-right font-bold">$250.00</td>
-            </tr>
-            <tr> 
-                <td>1002</td>
-                <td>01/12/2025 11:15:00</td>
-                <td>María López</td>
-                <td class="text-right">$258.62</td>
-                <td class="text-right">$41.38</td>
-                <td class="text-right font-bold">$300.00</td>
-            </tr>
-            <tr> 
-                <td>1003</td>
-                <td>02/12/2025 09:45:00</td>
-                <td>Juan Pérez</td>
-                <td class="text-right">$172.41</td>
-                <td class="text-right">$27.59</td>
-                <td class="text-right font-bold">$200.00</td>
-            </tr>
+            <?php if (count($ventas) > 0): ?>
+                <?php foreach ($ventas as $venta): ?>
+                <tr> 
+                    <td><?php echo htmlspecialchars($venta['folio']); ?></td>
+                    <td><?php echo date('d/m/Y H:i:s', strtotime($venta['fecha_hora'])); ?></td>
+                    <td><?php echo htmlspecialchars($venta['cajero']); ?></td>
+                    <td class="text-right">$<?php echo number_format($venta['subtotal'], 2); ?></td>
+                    <td class="text-right">$<?php echo number_format($venta['iva'], 2); ?></td>
+                    <td class="text-right font-bold">$<?php echo number_format($venta['total'], 2); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="6" class="text-center">No se encontraron ventas con los filtros aplicados.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
         <tfoot>
             <tr>
                 <td colspan="5" class="text-right font-bold bg-light-green">
-                    TOTAL FACTURADO
+                    **TOTAL FACTURADO**
                 </td>
                 <td class="text-right font-bold bg-light-green">
-                    $750.00
+                    $<?php echo number_format($suma_total_facturado, 2); ?>
                 </td>
             </tr>
             <tr>
                 <td colspan="5" class="text-right font-bold bg-light-gray">
-                    NÚMERO DE TICKETS
+                    **NÚMERO DE TICKETS**
                 </td>
                 <td class="text-right font-bold bg-light-gray">
-                    3
+                    <?php echo number_format($num_tickets, 0); ?>
                 </td>
             </tr>
             <tr>
                 <td colspan="5" class="text-right font-bold bg-gray">
-                    TICKET PROMEDIO
+                    **TICKET PROMEDIO**
                 </td>
                 <td class="text-right font-bold bg-gray">
-                    $250.00
+                    $<?php echo number_format($ticket_promedio, 2); ?>
                 </td>
             </tr>
         </tfoot>
@@ -175,5 +184,5 @@ ob_start();
 
 <?php
 $contenido_reporte = ob_get_clean();
-require_once 'plantilla.php';
+require_once 'plantilla.php'; 
 ?>
