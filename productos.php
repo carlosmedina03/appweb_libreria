@@ -1,19 +1,16 @@
 <?php
-// productos.php
-
-// 1. INCLUIR LA SEGURIDAD (Rol 5)
-// Este archivo valida:
-// a) Que haya sesión iniciada.
-// b) Que el rol sea 'admin'. Si es 'operador', lo bloquea con un 403.
+// ============================================================
+// RESPONSABLE: Rol 4 (CRUD) y Rol 2 (UI)
+// REQUERIMIENTO: "CRUD productos con imagen BLOB"
+// ============================================================
+require_once 'config/db.php';
 require_once 'includes/security_guard.php';
 
-// 2. Variables para la vista
-$rol = $_SESSION['user']['rol']; // Necesario para el Navbar
+// Variables para la vista
+$rol = $_SESSION['user']['rol'];
 $mensaje = "";
 
-require_once 'config/db.php';
-
-// PROCESAR FORMULARIO DE ALTA (Lógica Backend)
+// PROCESAR FORMULARIO DE ALTA
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'crear') {
     $codigo = $_POST['codigo'];
     $titulo = $_POST['titulo'];
@@ -30,29 +27,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     $mysqli->begin_transaction();
     try {
-        // 1. Insertar item
-        // Asegúrate de que tu tabla se llame 'items' o 'libros' según tu BD final.
-        // Aquí uso 'items' que es lo estándar del proyecto, ajusta si usaste 'libros'.
-        $sql = "INSERT INTO items (codigo, nombre, precio, activo) VALUES (?, ?, ?, 1)";
+        // 1. Insertar Libro
+        $sql = "INSERT INTO libros (codigo, titulo, precio_venta, estatus) VALUES (?, ?, ?, 1)";
         $stmt = $mysqli->prepare($sql);
         $stmt->bind_param("ssd", $codigo, $titulo, $precio);
         $stmt->execute();
-        $id_item = $mysqli->insert_id;
+        $id_libro = $mysqli->insert_id;
 
-        // 2. Insertar Imagen
+        // 2. Insertar Imagen (Si se subió)
         if ($imagen_binaria) {
-            // Nota: Verifica si tienes tabla 'imagenes_item' o si guardas directo en 'items'.
-            // Asumiendo tabla separada por tu código anterior:
-            $sql_img = "INSERT INTO imagenes_item (item_id, contenido, tipo_mime) VALUES (?, ?, ?)";
+            $sql_img = "INSERT INTO imagenes_libro (id_libro, contenido, tipo_mime, es_principal) VALUES (?, ?, ?, 1)";
             $stmt_img = $mysqli->prepare($sql_img);
+            
             $null = NULL;
-            $stmt_img->bind_param("ibs", $id_item, $null, $tipo_mime);
+            $stmt_img->bind_param("ibs", $id_libro, $null, $tipo_mime);
             $stmt_img->send_long_data(1, $imagen_binaria);
             $stmt_img->execute();
         }
         
         // 3. Insertar Existencia Inicial en 0
-        $mysqli->query("INSERT INTO existencias (item_id, cantidad) VALUES ($id_item, 0)");
+        $mysqli->query("INSERT INTO existencias (id_libro, cantidad) VALUES ($id_libro, 0)");
 
         $mysqli->commit();
         $mensaje = "Producto creado correctamente.";
@@ -66,8 +60,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// LISTAR PRODUCTOS (Para mostrar en la tabla real más adelante)
-// $productos = $mysqli->query("SELECT * FROM items WHERE activo = 1");
+// PROCESAR DESACTIVACIÓN DE PRODUCTO
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'desactivar') {
+    $id_desactivar = isset($_GET['id']) ? intval($_GET['id']) : 0;
+    if ($id_desactivar > 0) {
+        try {
+            $sql_desactivar = "UPDATE libros SET estatus = 0 WHERE id = ?";
+            $stmt_desactivar = $mysqli->prepare($sql_desactivar);
+            $stmt_desactivar->bind_param("i", $id_desactivar);
+            $stmt_desactivar->execute();
+            header("Location: productos.php"); 
+            exit;
+        } catch (Exception $e) {
+            $mensaje = "Error al desactivar el producto: " . $e->getMessage();
+        }
+    }
+}
+
+// PROCESAR ACTIVACIÓN DE PRODUCTO
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'activar') {
+    $id_activar = isset($_GET['id']) ? intval($_GET['id']) : 0;
+    if ($id_activar > 0) {
+        try {
+            $sql_activar = "UPDATE libros SET estatus = 1 WHERE id = ?";
+            $stmt_activar = $mysqli->prepare($sql_activar);
+            $stmt_activar->bind_param("i", $id_activar);
+            $stmt_activar->execute();
+            header("Location: productos.php"); 
+            exit;
+        } catch (Exception $e) {
+            $mensaje = "Error al activar el producto: " . $e->getMessage();
+        }
+    }
+}
+
+
+// LISTAR TODOS LOS PRODUCTOS (ELIMINANDO el filtro WHERE estatus = 1)
+$sql_productos = "
+    SELECT l.*, COALESCE(e.cantidad, 0) as cantidad 
+    FROM libros l 
+    LEFT JOIN existencias e ON l.id = e.id_libro 
+    /* ¡AQUÍ ES DONDE SE ELIMINA LA CLÁUSULA WHERE para ver TODOS! */
+    ORDER BY l.titulo
+";
+$productos = $mysqli->query($sql_productos);
 ?>
 
 <!doctype html>
@@ -82,26 +118,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
   <body>
     <div class="navbar">
-      <div class="navbar-logo">
-        <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo de María de Letras">
-      </div>
-      <div class="navbar-menu">
-        <a href="ventas.php">Punto de ventas</a>
         
-        <?php if ($rol === 'admin'): ?>
-            <a href="compras.php">Compras</a>
-            <a href="productos.php">Productos</a>
-            <a href="usuarios.php">Usuarios</a>
-            <a href="devoluciones.php">Devoluciones</a>
-            
-            <a href="reportes/inventario.php">Reportes</a>
-        <?php endif; ?>
+        <div class="navbar-logo">
+            <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
+        </div>
 
-        <a href="includes/logout.php" style="background: #333; color: white;">Salir</a>
-      </div>
+        <button class="menu-toggle" id="mobile-menu-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="navbar-menu" id="navbar-menu">
+
+            <div class="dropdown">
+                <button class="dropbtn">Cajero ▾</button>
+                <div class="dropdown-content">
+                    <a href="dashboard.php">Inicio</a>
+                    <a href="ventas.php">Punto de Venta</a>
+                    <a href="devoluciones.php">Devoluciones</a>
+                </div>
+            </div>
+            
+            <?php if (isset($_SESSION['user']['rol']) && $_SESSION['user']['rol'] === 'admin'): ?>
+                <div class="dropdown">
+                    <button class="dropbtn">Gestion ▾</button>
+                    <div class="dropdown-content">
+                        <a href="productos.php">Productos</a>
+                        <a href="compras.php">Compras</a>
+                        <a href="usuarios.php">Usuarios</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="dropbtn">Reportes ▾</button>
+                    <div class="dropdown-content">
+                        <a href="reportes/compras.php">Reportes Compra</a>
+                        <a href="reportes/devoluciones.php">Reportes Devoluciones</a>
+                        <a href="reportes/inventario.php">Reportes Inventario</a>
+                        <a href="reportes/ventas_detalle.php">Reportes Detalle</a>
+                        <a href="reportes/ventas_encabezado.php">Reportes Encabezado</a>
+                    </div>  
+                </div>
+            <?php endif; ?>
+            
+            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+        </div>
+
     </div>
 
-    <div class="container main-content-large" style="margin-top: 20px;">
+    <div class="container main-content-large">
         <div class="flex-between mb-15">
             <h2>Gestión de Inventario (Productos)</h2>
         </div>
@@ -125,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <input type="text" id="codigo" name="codigo" required placeholder="Ej: 978-0743273565" style="width: 100%; padding: 8px;">
 
                         <br><br>
-                        <label for="titulo">Título / Nombre</label><br>
+                        <label for="titulo">Título del Libro</label><br>
                         <input type="text" id="titulo" name="titulo" required placeholder="Ej: Cien Años de Soledad" style="width: 100%; padding: 8px;">
                     </div>
                     <div>
@@ -142,28 +208,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         </div>
 
         <div class="card">
-            <h3>Listado Actual</h3>
+            <h3>Listado Completo de Productos</h3>
             <table>
                 <thead>
                     <tr>
                         <th class="col-5">Img.</th>
                         <th class="col-15">Código</th>
-                        <th class="col-35">Título</th>
-                        <th class="col-10">Precio</th>
+                        <th class="col-30">Título</th>
+                        <th class="col-10">Precio Venta</th>
                         <th class="col-10">Stock</th>
-                        <th class="col-25">Acciones</th>
+                        <th class="col-10">Estado</th> <th class="col-20">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td colspan="6" style="text-align: center; color: #777;">
-                            (Aquí se listarán los productos desde la BD cuando el backend termine la consulta)
-                        </td>
-                    </tr>
+                    <?php if ($productos && $productos->num_rows > 0): ?>
+                        <?php while ($producto = $productos->fetch_assoc()): ?>
+                            <tr>
+                                <td><img src="img.php?tipo=producto&id=<?php echo $producto['id']; ?>" alt="Portada" style="width: 50px; height: 70px; object-fit: cover; border-radius: 4px;"></td>
+                                <td><?php echo htmlspecialchars($producto['codigo']); ?></td>
+                                <td><?php echo htmlspecialchars($producto['titulo']); ?></td>
+                                <td>$<?php echo number_format($producto['precio_venta'], 2); ?></td>
+                                <td><?php echo $producto['cantidad'] ?? 0; ?></td>
+                                
+                                <td>
+                                    <?php if ($producto['estatus'] == 1): ?>
+                                        <span style="color: green; font-weight: bold;">ACTIVO</span>
+                                    <?php else: ?>
+                                        <span style="color: red;">INACTIVO</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td style="text-align: center; white-space: nowrap;">
+                                    <a href="editar_producto.php?id=<?php echo $producto['id']; ?>" class="btn-sm btn-edit">
+                                            Editar
+                                    </a>
+    
+                                    <?php if ($producto['estatus'] == 1): ?>
+                                        <a href="productos.php?action=desactivar&id=<?php echo $producto['id']; ?>" 
+                                            class="btn-sm btn-delete"
+                                            onclick="return confirm('¿Estás seguro de que quieres desactivar este producto? No aparecerá en ventas.');">
+                                                Desactivar
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="productos.php?action=activar&id=<?php echo $producto['id']; ?>" 
+                                            class="btn-sm btn-save"
+                                            onclick="return confirm('¿Estás seguro de que quieres activar este producto?');">
+                                                Activar
+                                        </a>
+                                    <?php endif; ?>
+
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #777;">
+                                No hay productos registrados.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </div>
     
-    </body>
+
+    <script src="js/main.js"></script>
+  </body>
 </html>

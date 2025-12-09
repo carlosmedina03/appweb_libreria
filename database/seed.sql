@@ -1,7 +1,5 @@
--- ==========================================================
 -- ARCHIVO: seed.sql
 -- DATOS MÍNIMOS REQUERIDOS PARA INSTALAR Y PROBAR EL SISTEMA
--- ==========================================================
 
 USE libreria_db;
 

@@ -21,9 +21,9 @@ if (isset($_SESSION['error_mensaje'])) {
   </head>
 
   <body>
-    <div class="container" style="max-width: 400px; margin-top: 80px;">
-      <div class="logo" style="text-align: center;">
-        <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo de María de Letras" style="margin-bottom: 5px;">
+    <div class="container-login">
+      <div class="logo">
+        <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo de María de Letras">
         <h2>Iniciar Sesión</h2>
       </div>
 
@@ -57,7 +57,7 @@ if (isset($_SESSION['error_mensaje'])) {
             style="width: 100%; padding: 8px;">
         </div>
 
-        <button type="submit" class="btn" style="width: 100%; padding: 10px;">
+        <button type="submit" class="btn-login">
           Ingresar
         </button>
       </form>

@@ -14,33 +14,63 @@ $usuario_gen = 'Administrador'; // Placeholder for static version
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>María de letras | Reportes</title>
-    <link rel="stylesheet" href="../css/reportes.css"> 
-</head>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../assets/img/logo-maria-de-letras_icon.svg">
+    </head>
 
 <body>
-    <div class="navbar">
+<div class="navbar">
+        
         <div class="navbar-logo">
-            <img src="../assets/img/logo-maria-de-letras_v2.svg" alt="Logo de María de Letras">
+            <img src="../assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
         </div>
-        <div class="navbar-menu">
-            <a href="../ventas.php">Punto de ventas</a>
-            <a href="../productos.php">Productos</a>
-            <a href="../compras.php">Compras</a>
-            <a href="../devoluciones.php">Devoluciones</a>
-            <a href="../usuarios.php">Usuario</a>
 
-            <a href="compras.php">Reportes compra</a>
-            <a href="devoluciones.php">Reportes devoluciones</a>
-            <a href="inventario.php">Reportes inventario</a>
-            <a href="ventas_detalle.php">Reportes detalle</a>
-            <a href="ventas_encabezado.php">Reportes encabezado</a>
+        <button class="menu-toggle" id="mobile-menu-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
 
-            <a href="../index.php">Salir</a>
+        <div class="navbar-menu" id="navbar-menu">
+
+            <div class="dropdown">
+                <button class="dropbtn">Cajero ▾</button>
+                <div class="dropdown-content">
+                    <a href="../dashboard.php">Inicio</a>
+                    <a href="../ventas.php">Punto de Venta</a>
+                    <a href="../devoluciones.php">Devoluciones</a>
+                </div>
+            </div>
+            
+            <?php if (isset($_SESSION['user']['rol']) && $_SESSION['user']['rol'] === 'admin'): ?>
+                <div class="dropdown">
+                    <button class="dropbtn">Gestion ▾</button>
+                    <div class="dropdown-content">
+                        <a href="../productos.php">Productos</a>
+                        <a href="../compras.php">Compras</a>
+                        <a href="../usuarios.php">Usuarios</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="dropbtn">Reportes ▾</button>
+                    <div class="dropdown-content">
+                        <a href="compras.php">Reportes Compra</a>
+                        <a href="devoluciones.php">Reportes Devoluciones</a>
+                        <a href="inventario.php">Reportes Inventario</a>
+                        <a href="ventas_detalle.php">Reportes Detalle</a>
+                        <a href="ventas_encabezado.php">Reportes Encabezado</a>
+                    </div>  
+                </div>
+            <?php endif; ?>
+            
+            <a href="../includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
         </div>
     </div>
 
+ 
+
     <div class="container main-content-large">
-        <!-- CABECERA DE REPORTE (Común para todos) -->
         <div class="report-header">
             <img src="../assets/img/logo-maria-de-letras_icon.svg" alt="Logo" style="height: 50px;">
             <h1 class="report-title"><?php echo htmlspecialchars($titulo_reporte ?? 'REPORTE'); ?></h1>
@@ -50,15 +80,15 @@ $usuario_gen = 'Administrador'; // Placeholder for static version
             </div>
         </div>
         
-        <!-- CONTENIDO ESPECÍFICO DEL REPORTE (Insertado desde el archivo principal) -->
         <?php echo $contenido_reporte; ?>
 
-        <!-- PIE DE PÁGINA (Común para todos) -->
         <div class="report-footer">
             <p style="margin: 0;">Generado por: <?php echo htmlspecialchars($usuario_gen); ?></p>
             <p style="margin: 0;">Página 1 de 1</p> 
         </div>
 
-    </div>
+    </div>   
+    
+    <script src="../js/main.js"></script>
 </body>
 </html>

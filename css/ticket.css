@@ -3,15 +3,23 @@ REQUERIMIENTO: Configuración de impresión 80x40mm
 */
 @media print {
     @page {
-        size: 80mm 40mm;
-        /* El requerimiento estricto */
+        /* SOLUCIÓN: Especificar solo el ancho. La altura se ajustará al contenido.
+           Esto evita que el navegador intente rotar la página. */
+        size: 80mm;
         margin: 0;
     }
 
     body {
-        margin: 0;
-        /* Asegura que el body pueda crecer infinitamente */
-        height: auto;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 8pt; /* Tamaño base para el texto normal */
+        margin: 0; /* SOLUCIÓN: Eliminar 'auto' para evitar el cálculo de margen vertical infinito */
+        width: 100%; /* El body ocupa el 100% del @page (80mm) */
+        max-width: 80mm; /* Doble seguro para evitar desbordamiento */
+        box-sizing: border-box;
+        writing-mode: horizontal-tb; /* Asegura la orientación vertical */
+        padding: 0 1.5mm; /* Margen de seguridad interno para evitar cortes en los bordes */
+        overflow-x: hidden; /* Previene cualquier desbordamiento horizontal */
+        height: auto; /* Asegura que la altura se ajuste solo al contenido */
     }
 
     /* Regla de ORO para que no se rompan los textos */
@@ -23,5 +31,17 @@ REQUERIMIENTO: Configuración de impresión 80x40mm
         /* Esto evita que una fila se corte a la mitad entre una "página" y otra */
         break-inside: avoid;
         page-break-inside: avoid;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    pre {
+        font-family: inherit; /* Hereda la fuente monoespaciada del body */
+        font-size: inherit;   /* Hereda el tamaño de fuente */
+        margin: 0;
+        white-space: pre-wrap; /* Permite que el texto se ajuste si es necesario */
+        overflow-wrap: break-word; /* Fuerza el corte de palabras largas para que no desborden */
     }
 }
