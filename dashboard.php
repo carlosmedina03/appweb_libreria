@@ -97,5 +97,17 @@ $rol = $usuario['rol'];
     </div>
 
     <script src="js/main.js"></script>
+    <script src="js/offline_manager.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('SW registrado. Listo para offline.', reg.scope))
+            .catch(err => console.error('SW falló:', err));
+            });
+        }
+    </script>
+
 </body>
 </html>

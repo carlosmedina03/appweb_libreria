@@ -92,6 +92,7 @@ ob_start();
         Total de Productos: **<?php echo $total_items; ?>**
     </p>
     
+    <div class="table-responsive">
     <table>
         <thead>
             <tr class="bg-green"> 
