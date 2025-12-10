@@ -45,13 +45,13 @@ $rol = $usuario['rol'];
             <div class="card">
                 <h3>Punto de Venta</h3>
                 <p>Realizar ventas, cobrar y emitir tickets.</p>
-                <a href="ventas.php" class="btn w-full" style="display:block; text-align:center;">Ir a Caja</a>
+                <a href="ventas.php" class="btn w-full btn-block-center">Ir a Caja</a>
             </div>
 
             <div class="card">
                 <h3>Devoluciones</h3>
                 <p>Gestionar devoluciones de productos.</p>
-                <a href="devoluciones.php" class="btn w-full" style="display:block; text-align:center;">Ir a Devoluciones</a>
+                <a href="devoluciones.php" class="btn w-full btn-block-center">Ir a Devoluciones</a>
             </div>
         </div>
 <?php if ($rol === 'admin'): ?>

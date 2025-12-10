@@ -107,33 +107,34 @@ function imprimir_linea($nombre, $cantidad, $precio, $importe, $anchoTotal = 48)
     <title><?php echo $titulo_ticket; ?> #<?php echo $folio; ?></title>
     <link rel="stylesheet" href="css/ticket.css">
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <script src="js/main.js"></script>
   </head>
   
   <body>
-    <div class="ticket">
-      <div style="text-align: center;">
-        <img src="img.php?tipo=logo" alt="Logo" style="width: 250px; max-width: 90%; height: auto; margin-bottom: 10px;">
-        <h1 style="font-size: 12pt; margin: 0;"><?php echo htmlspecialchars($negocio['razon_social']); ?></h1>
-        <p style="margin: 2px 0; font-size: 7.5pt;">
+    <div class="ticket" data-folio="<?php echo str_pad($folio, 8, '0', STR_PAD_LEFT); ?>">
+      <div class="ticket-logo-container">
+        <img src="img.php?tipo=logo" alt="Logo" class="ticket-logo">
+        <h1 class="ticket-title"><?php echo htmlspecialchars($negocio['razon_social']); ?></h1>
+        <p class="ticket-info">
           <?php echo htmlspecialchars($negocio['domicilio']); ?>
           <br>
           Tel: <?php echo htmlspecialchars($negocio['telefono'] ?? ''); ?>
         </p>
-        <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
+        <div class="dashed-line"></div>
       </div>
       
       <div>
-        <p style="margin: 0; font-weight: bold;"><?php echo $titulo_ticket; ?>: <?php echo $encabezado['id']; ?></p>
+        <p class="ticket-header-text" style="font-weight: bold;"><?php echo $titulo_ticket; ?>: <?php echo $encabezado['id']; ?></p>
         <?php if ($tipo === 'devolucion'): ?>
-            <p style="margin: 0;">SOBRE VENTA ORIGINAL: #<?php echo $encabezado['folio_original']; ?></p>
+            <p class="ticket-header-text">SOBRE VENTA ORIGINAL: #<?php echo $encabezado['folio_original']; ?></p>
         <?php endif; ?>
-        <p style="margin: 0;">FECHA: <?php echo date('d/m/Y H:i', strtotime($encabezado['fecha_hora'])); ?></p>
-        <p style="margin: 0 0 5px 0;">CAJERO: <?php echo htmlspecialchars($encabezado['cajero']); ?></p>
-        <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
+        <p class="ticket-header-text">FECHA: <?php echo date('d/m/Y H:i', strtotime($encabezado['fecha_hora'])); ?></p>
+        <p class="ticket-subheader-text">CAJERO: <?php echo htmlspecialchars($encabezado['cajero']); ?></p>
+        <div class="dashed-line"></div>
       </div>
 
       <div class="detalle-productos">
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed black; margin-bottom: 3px; font-weight: bold;">
+        <div class="ticket-table-header">
             <span>PRODUCTO</span>
             <span>CANT/TOTAL</span>
         </div>
@@ -150,21 +151,21 @@ function imprimir_linea($nombre, $cantidad, $precio, $importe, $anchoTotal = 48)
         ?></pre>
       </div>
 
-      <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
+      <div class="dashed-line"></div>
 
-      <div style="text-align: right;">
+      <div class="text-right">
         <?php if ($tipo === 'venta'): ?>
-            <p style="margin: 0;">SUBTOTAL: $<?php echo number_format($encabezado['subtotal'], 2); ?></p>
-            <p style="margin: 0;">IVA (16%): $<?php echo number_format($encabezado['iva'], 2); ?></p>
-            <h2 style="margin: 5px 0 10px 0; font-size: 11pt; font-weight: bold;">TOTAL: $<?php echo number_format($encabezado['total'], 2); ?></h2>
+            <p class="ticket-header-text">SUBTOTAL: $<?php echo number_format($encabezado['subtotal'], 2); ?></p>
+            <p class="ticket-header-text">IVA (16%): $<?php echo number_format($encabezado['iva'], 2); ?></p>
+            <h2 class="ticket-total">TOTAL: $<?php echo number_format($encabezado['total'], 2); ?></h2>
         <?php else: ?>
-            <h2 style="margin: 5px 0 10px 0; font-size: 11pt; font-weight: bold;">TOTAL REEMBOLSADO: $<?php echo number_format($encabezado['total_reembolsado'], 2); ?></h2>
+            <h2 class="ticket-total">TOTAL REEMBOLSADO: $<?php echo number_format($encabezado['total_reembolsado'], 2); ?></h2>
         <?php endif; ?>
       </div>
 
-      <div style="text-align: center; margin-top: 10px;">
-        <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
-        <p style="margin: 0;"><?php echo htmlspecialchars($negocio['mensaje_ticket'] ?? '¡Gracias por su compra!'); ?></p>
+      <div class="ticket-center">
+        <div class="dashed-line"></div>
+        <p class="ticket-header-text"><?php echo htmlspecialchars($negocio['mensaje_ticket'] ?? '¡Gracias por su compra!'); ?></p>
         <p style="margin: 2px 0 0 0;">(Powered by Sistema MDL)</p>
 
         <div style="margin-top: 10px;">
@@ -173,29 +174,9 @@ function imprimir_linea($nombre, $cantidad, $precio, $importe, $anchoTotal = 48)
 
       </div>
 
-      <div class="no-print" style="text-align: center; margin-top: 20px;">
-          <button onclick="window.close()" class="btn" style="width: 80%; background: #555;">Cerrar Ticket</button>
+      <div class="no-print ticket-center" style="margin-top: 20px;">
+          <button class="btn btn-close-window">Cerrar Ticket</button>
       </div>
     </div>
-
-    <script>
-        JsBarcode("#codigoBarrasTicket", "<?php echo str_pad($folio, 8, '0', STR_PAD_LEFT); ?>", {
-            format: "CODE128", // este formato lee números y letras, sirve para folios
-            lineColor: "#000",
-            width: 2,          
-            height: 40,        
-            displayValue: true,
-            fontSize: 14,
-            margin: 5
-        });
-    </script>
-
-    <script>
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                window.print();
-            }, 500); // 500ms de retardo para asegurar que todo cargue
-        });
-    </script>
   </body>
 </html>

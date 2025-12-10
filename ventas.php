@@ -106,7 +106,7 @@ if (!isset($_SESSION['carrito'])) {
           </thead>
           <tbody id="tabla-carrito">
             <tr>
-                <td colspan="5" style="text-align: center; color: #777;">Escanea un producto para comenzar...</td>
+                <td colspan="5" class="text-center-muted">Escanea un producto para comenzar...</td>
             </tr>
           </tbody>
         </table>
@@ -116,8 +116,8 @@ if (!isset($_SESSION['carrito'])) {
         Total: <span id="total-display">$0.00</span>
       </div>
 
-      <div class="flex-row mt-15" style="justify-content: flex-end; gap: 15px;">
-        <button id="btn-cancelar" class="btn" style="background-color: #777;">
+      <div class="flex-row mt-15 flex-end-gap">
+        <button id="btn-cancelar" class="btn btn-secondary">
           Cancelar Venta
         </button>
         <button id="btn-cobrar" class="btn">

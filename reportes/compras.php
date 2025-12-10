@@ -87,7 +87,7 @@ ob_start();
                 Generar Reporte
             </button>
             
-            <button type="button" class="btn w-150" onclick="window.print()">
+            <button type="button" class="btn w-150 btn-print">
                 Imprimir / PDF
             </button>
             
