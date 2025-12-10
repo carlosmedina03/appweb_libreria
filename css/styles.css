@@ -1,9 +1,13 @@
 /* RESPONSABLE: Rol 2 (UX-UI) */
 /* Estilos generales de la aplicación web - Versión Simplificada */
 
-/* ==========================
-  ESTILO BASE
-========================== */
+/* ====================================================================
+   ESTILOS GLOBALES Y ESTRUCTURA DE LAYOUT
+   Define la tipografía, el fondo principal y la estructura de los
+   contenedores base y el contenedor principal (main-container)
+==================================================================== */
+
+/* Estilos aplicados al cuerpo de la página: fuente, fondo degradado, centrado del contenido y color de texto base */
 body {
   font-family: Arial, Helvetica, sans-serif;
   background: linear-gradient(135deg, #E1580F, #9C0722);
@@ -15,7 +19,7 @@ body {
   min-height: 100vh;
 }
 
-/* Base Container & Card Syles - Consolidado */
+/* Tarjeta de Login: Contenedor específico para la vista de acceso, centrado y limitado a 400px */
 .container-login {
   background: #fff;
   border-radius: 10px;
@@ -28,10 +32,12 @@ body {
   text-align: center;
 }
 
+/* Alineación para los formularios de la página de inicio */
 .form-index {
   text-align: left;
 }
 
+/* Estilos de inicialización compartidos: fondo blanco y bordes redondeados */
 .main-container,
 .card {
   background: #fff;
@@ -39,15 +45,16 @@ body {
   box-sizing: border-box;
 }
 
+/* Contenedor Principal: Fija el ancho a 1200px, fondo blanco y centrado en la página */
 .main-container {
   width: 1200px;
   background-color: #ffffff;
   margin: 100px auto 30px auto;
   padding: 22px;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
-  /* Centered by margin: auto */
 }
 
+/* Estilos de tarjetas de contenido: padding, margen y sombra suave */
 .card {
   padding: 16px;
   margin: 12px 0;
@@ -55,11 +62,13 @@ body {
   width: 97%;
 }
 
-/* Cleaned up main-content sizers */
+/* ====================================================================
+   UTILIDADES (UTILITIES)
+   Clases para aplicar rápidamente márgenes, alineación de texto, tamaños
+   de fuente, colores y control de ancho
+==================================================================== */
 
-/* ==========================
-  UTILIDADES DE ESPACIADO & TEXTO
-========================== */
+/* Márgenes superiores comunes */
 .mt-15 {
   margin-top: 15px;
 }
@@ -72,6 +81,7 @@ body {
   margin-top: 30px;
 }
 
+/* Márgenes inferiores comunes */
 .mb-15 {
   margin-bottom: 15px;
 }
@@ -84,6 +94,7 @@ body {
   margin-bottom: 30px;
 }
 
+/* Alineación de texto */
 .text-center,
 .text-center-muted {
   text-align: center;
@@ -98,10 +109,12 @@ body {
   white-space: nowrap;
 }
 
+/* Peso de fuente */
 .font-bold {
   font-weight: bold;
 }
 
+/* Tamaños de fuente */
 .text-sm {
   font-size: 14px;
 }
@@ -114,6 +127,7 @@ body {
   font-size: 24px;
 }
 
+/* Colores de texto: gris, muted, rojo/peligro y verde/éxito */
 .text-gray,
 .report-footer {
   color: #555;
@@ -129,7 +143,6 @@ body {
   font-size: 0.8em;
 }
 
-/* Red Colors */
 .text-red,
 .text-danger,
 .text-danger-simple,
@@ -153,7 +166,7 @@ body {
   font-weight: bold;
 }
 
-/* Widths */
+/* Utilidades de ancho */
 .w-full,
 .w-full input,
 .w-full select,
@@ -178,7 +191,7 @@ body {
   width: 150px;
 }
 
-/* Grid & Flex */
+/* Grid & Flexbox */
 .grid-2,
 .grid-2-cols {
   display: grid;
@@ -203,12 +216,11 @@ body {
   gap: 15px;
 }
 
-/* Added display:flex explicitly */
 .flex-grow {
   flex-grow: 1;
 }
 
-/* Tabla Columnas */
+/* Utilidades de ancho para columnas de tabla */
 .col-5 {
   width: 5%;
 }
@@ -233,17 +245,22 @@ body {
   width: 35%;
 }
 
-/* ==========================
-  COMPONENTES
-========================== */
+/* ====================================================================
+   COMPONENTES
+   Estilos específicos para elementos comunes como formularios, tablas,
+   navbar, banners y alertas
+==================================================================== */
+
+/* Banner de bienvenida con borde lateral resaltado */
 .welcome-banner {
-  background-color: #f8f9fa;
+  background-color: #fff;
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 20px;
   border-left: 5px solid #C82B1D;
 }
 
+/* Tipografía dentro de las tarjetas */
 .card h3 {
   margin: 0 0 15px 0;
   font-size: 18px;
@@ -256,7 +273,7 @@ body {
   color: #555;
 }
 
-/* Formularios */
+/* Base de Formularios: estilos para etiquetas y campos de entrada */
 form,
 label {
   display: block;
@@ -282,6 +299,7 @@ textarea {
   box-sizing: border-box;
 }
 
+/* Resaltado del campo al hacer focus */
 input:focus,
 select:focus,
 textarea:focus {
@@ -294,6 +312,7 @@ textarea:focus {
   padding: 7px 0;
 }
 
+/* Tamaños de inputs específicos para cantidades y costos */
 .input-qty-small {
   width: 80px;
   text-align: center;
@@ -309,9 +328,12 @@ textarea:focus {
   width: 100px;
 }
 
-/* ==========================
-  BOTONES (ESTANDARIZADOS)
-========================== */
+/* ====================================================================
+   BOTONES (ESTANDARIZADOS)
+   Clases unificadas para las tres categorías de botones (General, Editar, Desactivar)
+==================================================================== */
+
+/* Estilos base compartidos por todos los botones */
 .btn-general,
 .btn-editar,
 .btn-desactivar {
@@ -327,23 +349,18 @@ textarea:focus {
   color: #fff !important;
 }
 
-/* 1. Botones Generales (Acciones no específicas) */
+/* 1. Botones Generales: Fondo rojo, hover naranja */
 .btn-general {
   background: #9C0722;
-  /* Rojo fuerte */
 }
 
 .btn-general:hover {
   background: #C82B1D;
-  /* Naranja */
 }
 
-/* 2. Botones de Edición (Productos) */
+/* 2. Botones de Edición: Color azul estándar */
 .btn-editar {
   background-color: #007bff;
-  /* Sizing adaptation for tables via hierarchical selector if needed, 
-     but enforcing standard padding here. 
-     If small size required, use standard. */
 }
 
 .btn-editar:hover {
@@ -351,18 +368,17 @@ textarea:focus {
   transform: translateY(-1px);
 }
 
-/* 3. Botones de Desactivación (Productos) */
+/* 3. Botones de Desactivación: Color rojo de peligro */
 .btn-desactivar {
   background-color: #dc3545;
 }
 
 .btn-desactivar:hover {
   background-color: #a71d2a;
-  /* Darker red */
   transform: translateY(-1px);
 }
 
-/* Ajuste Jerárquico para Botones en Tablas (Small) */
+/* Ajuste: Botones más pequeños cuando se usan en tablas */
 table .btn-editar,
 table .btn-desactivar,
 table .btn-general {
@@ -373,15 +389,14 @@ table .btn-general {
   margin: 0 2px;
 }
 
-/* Revert size for btn-general in Navbar or other places outside tables if needed */
+/* Sobrescribe el ajuste anterior para botones en la barra de navegación */
 .navbar .btn-general {
-  /* Navbar "Cerrar Sesión" used to be standard padding. */
   padding: 10px;
   font-size: 15px;
 }
 
 
-/* Alertas */
+/* Alertas: Mensajes de éxito y error */
 .error-message,
 .alert-custom-danger {
   background: #f8d7da;
@@ -402,7 +417,7 @@ table .btn-general {
   border: 1px solid #c3e6cb;
 }
 
-/* Tablas e Imágenes */
+/* Tablas: Estilos base, encabezados, celdas y efecto hover */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -426,6 +441,7 @@ tr:hover {
   background: #f1f1f1;
 }
 
+/* Imagen de producto pequeña para tablas o listados */
 .img-product-small {
   width: 50px;
   height: 70px;
@@ -434,7 +450,7 @@ tr:hover {
   border: 1px solid #ddd;
 }
 
-/* Navbar */
+/* Navbar: Barra de navegación superior fija */
 .navbar {
   position: fixed;
   top: 0;
@@ -466,8 +482,7 @@ tr:hover {
   color: #9F0A1F;
 }
 
-/* Dashboard & Admin Cards */
-/* Helper for centering content inside 1200px container (e.g. Login) */
+/* Componentes de Administración y Dashboard */
 .content-center-box {
   max-width: 400px;
   margin: 0 auto;
@@ -478,6 +493,7 @@ tr:hover {
   text-align: left;
 }
 
+/* Grid y tarjetas del Dashboard */
 .dashboard-grid {
   display: flex !important;
   flex-wrap: wrap;
@@ -495,6 +511,7 @@ tr:hover {
   padding-top: 20px;
 }
 
+/* Grid de acciones de administrador (2 columnas) */
 .admin-grid-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -505,6 +522,7 @@ tr:hover {
   grid-column: span 2;
 }
 
+/* Tarjetas de botón de administración con ícono */
 .admin-btn-card {
   display: flex;
   flex-direction: column;
@@ -532,6 +550,7 @@ tr:hover {
   font-weight: bold;
 }
 
+/* Efecto hover en la tarjeta de administración */
 .admin-btn-card:hover {
   background-color: #C82B1D;
   border-color: #C82B1D;
@@ -544,13 +563,14 @@ tr:hover {
   fill: #fff;
 }
 
+/* Separador horizontal */
 .divider {
   border: 0;
   border-top: 1px solid #eee;
   margin: 15px 0 25px 0;
 }
 
-/* Dropdown */
+/* Dropdown: Estilos para el menú desplegable */
 .dropdown {
   position: relative;
   display: inline-block;
@@ -590,13 +610,14 @@ tr:hover {
   color: #C82B1D;
 }
 
+/* Muestra el dropdown al hacer hover en desktop */
 @media (min-width: 769px) {
   .dropdown:hover .dropdown-content {
     display: block;
   }
 }
 
-/* Reportes */
+/* Reportes: Estilos para la cabecera, título, metadatos y pie de página de los reportes */
 .report-header {
   border-bottom: 2px solid #ccc;
   padding-bottom: 15px;
@@ -630,7 +651,8 @@ tr:hover {
   justify-content: space-between;
 }
 
-/* Responsive */
+/* Estilos de Responsive: Adaptación para dispositivos móviles y tablets */
+/* Botón de menú (hamburguesa) que solo se muestra en móvil */
 .menu-toggle {
   display: none;
   flex-direction: column;
@@ -653,11 +675,13 @@ tr:hover {
   transition: all 0.3s ease;
 }
 
+/* Reglas de móvil (< 768px) */
 @media (max-width: 768px) {
   .menu-toggle {
     display: flex;
   }
 
+  /* Menú de navegación en modo colapsado (slide-down) */
   .navbar-menu {
     display: none;
     position: absolute;
@@ -686,6 +710,7 @@ tr:hover {
     text-align: center;
   }
 
+  /* Ajustes para el dropdown en móvil */
   .dropdown,
   .dropbtn {
     width: 100%;
@@ -710,6 +735,7 @@ tr:hover {
     animation: slideDown 0.3s ease forwards;
   }
 
+  /* El grid de administración pasa a ser de una columna */
   .admin-grid-actions {
     grid-template-columns: 1fr;
   }
@@ -719,6 +745,7 @@ tr:hover {
   }
 }
 
+/* Animación de apertura del menú móvil */
 @keyframes slideDown {
   from {
     opacity: 0;
