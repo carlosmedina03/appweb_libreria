@@ -106,16 +106,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
                 </div>
             <?php endif; ?>
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
 
     </div>
 
-    <div class="container main-content-small">
+    <div class="main-container">
         <h2>Gestión de Devoluciones</h2>
 
         <?php if (!empty($mensaje_error)): ?>
-            <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 20px; border-radius: 5px;">
+            <div class="alert-custom-danger">
                 <?php echo htmlspecialchars($mensaje_error); ?>
             </div>
         <?php endif; ?>
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
                         required 
                         class="flex-grow w-auto"
                         value="<?php echo isset($_POST['folio_input']) ? htmlspecialchars($_POST['folio_input']) : ''; ?>">
-                    <button type="submit" class="btn w-150">Buscar Venta</button>
+                    <button type="submit" class="btn-general w-150">Buscar Venta</button>
                 </div>
             </form>
         </div>
@@ -163,13 +163,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
                     <tbody>
                         <?php foreach ($detalles_venta as $item): ?>
                         <tr>
-                            <td style="text-align: center;">
+                            <td class="text-center">
                                 <input type="checkbox" class="check-devolucion" data-id="<?php echo $item['id_libro']; ?>">
                             </td>
                             <td><?php echo htmlspecialchars($item['titulo']); ?></td>
                             <td><?php echo htmlspecialchars($item['codigo']); ?></td>
-                            <td style="text-align: center;"><?php echo $item['cantidad']; ?></td>
-                            <td style="text-align: center;">
+                            <td class="text-center"><?php echo $item['cantidad']; ?></td>
+                            <td class="text-center">
                                 <input type="number" 
                                     class="input-cant-dev"
                                     id="cant_<?php echo $item['id_libro']; ?>"
@@ -177,19 +177,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
                                     max="<?php echo $item['cantidad']; ?>" 
                                     value="1" 
                                     disabled
-                                    style="width: 60px; padding: 5px; text-align: center;">
+                                    class="input-cant-dev input-qty-xs"
                             </td>
-                            <td style="text-align: right;">$<?php echo number_format($item['precio_unitario'], 2); ?></td>
+                            <td class="text-right">$<?php echo number_format($item['precio_unitario'], 2); ?></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
                 <div class="mt-15">
                     <label for="motivo_devolucion">Motivo de la Devolución</label>
-                    <input type="text" id="motivo_devolucion" name="motivo_devolucion" placeholder="Ej: Defecto de fábrica, cliente se arrepintió..." style="width: 100%;">
+                    <input type="text" id="motivo_devolucion" name="motivo_devolucion" placeholder="Ej: Defecto de fábrica, cliente se arrepintió..." class="w-full">
                 </div>
                 <div class="text-right">
-                    <button type="button" id="btn-procesar-devolucion" class="btn mt-15" style="background-color: #c0392b;">
+                    <button type="button" id="btn-procesar-devolucion" class="btn-general mt-15">
                         Procesar Devolución Seleccionada
                     </button>
                 </div>

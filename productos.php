@@ -162,21 +162,18 @@ $productos = $mysqli->query($sql_productos);
                 </div>
             <?php endif; ?>
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
 
     </div>
 
-    <div class="container main-content-large">
+    <div class="main-container">
         <div class="flex-between mb-15">
             <h2>Gestión de Inventario (Productos)</h2>
         </div>
 
         <?php if (!empty($mensaje)): ?>
-            <div style="padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center; 
-                background-color: <?php echo strpos($mensaje, 'Error') !== false ? '#f8d7da' : '#d4edda'; ?>;
-                color: <?php echo strpos($mensaje, 'Error') !== false ? '#721c24' : '#155724'; ?>;
-                border: 1px solid <?php echo strpos($mensaje, 'Error') !== false ? '#f5c6cb' : '#c3e6cb'; ?>;">
+            <div class="<?php echo strpos($mensaje, 'Error') !== false ? 'alert-custom-danger' : 'alert-custom-success'; ?> text-center">
                 <?php echo htmlspecialchars($mensaje); ?>
             </div>
         <?php endif; ?>
@@ -185,25 +182,25 @@ $productos = $mysqli->query($sql_productos);
             <h3>Alta de Nuevo Producto</h3>
             <form method="POST" action="" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="crear">
-                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="grid-2-cols">
                     <div>
                         <label for="codigo">Código (ISBN/SKU)</label><br>
-                        <input type="text" id="codigo" name="codigo" required placeholder="Ej: 978-0743273565" style="width: 100%; padding: 8px;">
+                        <input type="text" id="codigo" name="codigo" required placeholder="Ej: 978-0743273565" class="input-padded">
 
                         <br><br>
                         <label for="titulo">Título del Libro</label><br>
-                        <input type="text" id="titulo" name="titulo" required placeholder="Ej: Cien Años de Soledad" style="width: 100%; padding: 8px;">
+                        <input type="text" id="titulo" name="titulo" required placeholder="Ej: Cien Años de Soledad" class="input-padded">
                     </div>
                     <div>
                         <label for="precio">Precio de Venta</label><br>
-                        <input type="number" id="precio" name="precio" required step="0.01" min="0" placeholder="Ej: 250.00" style="width: 100%; padding: 8px;">
+                        <input type="number" id="precio" name="precio" required step="0.01" min="0" placeholder="Ej: 250.00" class="input-padded">
                         
                         <br><br>
                         <label for="imagen">Imagen (Máx. 2MB)</label><br>
-                        <input type="file" id="imagen" name="imagen" accept="image/*" class="w-full" style="padding: 7px 0;">
+                        <input type="file" id="imagen" name="imagen" accept="image/*" class="w-full file-input-padded">
                     </div>
                 </div>
-                <button type="submit" class="btn" style="margin-top: 15px;">Guardar Producto</button>
+                <button type="submit" class="btn-general mt-15">Guardar Producto</button>
             </form>
         </div>
 
@@ -225,7 +222,7 @@ $productos = $mysqli->query($sql_productos);
                     <?php if ($productos && $productos->num_rows > 0): ?>
                         <?php while ($producto = $productos->fetch_assoc()): ?>
                             <tr>
-                                <td><img src="img.php?tipo=producto&id=<?php echo $producto['id']; ?>" alt="Portada" style="width: 50px; height: 70px; object-fit: cover; border-radius: 4px;"></td>
+                                <td><img src="img.php?tipo=producto&id=<?php echo $producto['id']; ?>" alt="Portada" class="img-product-small"></td>
                                 <td><?php echo htmlspecialchars($producto['codigo']); ?></td>
                                 <td><?php echo htmlspecialchars($producto['titulo']); ?></td>
                                 <td>$<?php echo number_format($producto['precio_venta'], 2); ?></td>
@@ -233,27 +230,27 @@ $productos = $mysqli->query($sql_productos);
                                 
                                 <td>
                                     <?php if ($producto['estatus'] == 1): ?>
-                                        <span style="color: green; font-weight: bold;">ACTIVO</span>
+                                        <span class="text-success-bold">ACTIVO</span>
                                     <?php else: ?>
-                                        <span style="color: red;">INACTIVO</span>
+                                        <span class="text-danger-simple">INACTIVO</span>
                                     <?php endif; ?>
                                 </td>
 
-                                <td style="text-align: center; white-space: nowrap;">
-                                    <a href="editar_producto.php?id=<?php echo $producto['id']; ?>" class="btn-sm btn-edit">
+                                <td class="text-center text-nowrap">
+                                    <a href="editar_producto.php?id=<?php echo $producto['id']; ?>" class="btn-editar">
                                             Editar
                                     </a>
     
                                     <?php if ($producto['estatus'] == 1): ?>
                                         <a href="productos.php?action=desactivar&id=<?php echo $producto['id']; ?>" 
-                                            class="btn-sm btn-delete"
-                                            onclick="return confirm('¿Estás seguro de que quieres desactivar este producto? No aparecerá en ventas.');">
+                                            class="btn-desactivar btn-confirm-action"
+                                            data-confirm-message="¿Estás seguro de que quieres desactivar este producto? No aparecerá en ventas.">
                                                 Desactivar
                                         </a>
                                     <?php else: ?>
                                         <a href="productos.php?action=activar&id=<?php echo $producto['id']; ?>" 
-                                            class="btn-sm btn-save"
-                                            onclick="return confirm('¿Estás seguro de que quieres activar este producto?');">
+                                            class="btn-general btn-confirm-action"
+                                            data-confirm-message="¿Estás seguro de que quieres activar este producto?">
                                                 Activar
                                         </a>
                                     <?php endif; ?>
@@ -263,7 +260,7 @@ $productos = $mysqli->query($sql_productos);
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" style="text-align: center; color: #777;">
+                            <td colspan="7" class="text-center text-muted">
                                 No hay productos registrados.
                             </td>
                         </tr>

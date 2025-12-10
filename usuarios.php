@@ -75,16 +75,7 @@ while ($row = $resultado->fetch_assoc()) {
     <title>María de Letras | Usuarios</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" type="image/png" href="assets/img/logo-maria-de-letras_icon.svg">
-    <style>
-        /* Estilos simples para el formulario que agregué */
-        .form-container {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-        }
-    </style>
+
   </head>
 
   <body>
@@ -133,12 +124,12 @@ while ($row = $resultado->fetch_assoc()) {
                 </div>
             <?php endif; ?>
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
 
     </div>
 
-    <div class="container main-content">
+    <div class="main-container">
         <div class="flex-between mb-15">
             <h2>Administración de Usuarios</h2>
         </div>
@@ -160,7 +151,7 @@ while ($row = $resultado->fetch_assoc()) {
                 </thead>
                 <tbody>
                     <?php if (empty($usuarios_db)): ?>
-                        <tr><td colspan="6" style="text-align:center;">No hay usuarios registrados.</td></tr>
+                        <tr><td colspan="6" class="text-center">No hay usuarios registrados.</td></tr>
                     <?php else: ?>
                         <?php foreach ($usuarios_db as $u): ?>
                         <tr>
@@ -170,24 +161,24 @@ while ($row = $resultado->fetch_assoc()) {
                             <td><?php echo ucfirst($u['rol']); ?></td>
                             <td>
                                 <?php if ($u['activo'] == 1): ?>
-                                    <span style="color: green; font-weight: bold;">Activo</span>
+                                    <span class="text-success-bold">Activo</span>
                                 <?php else: ?>
-                                    <span style="color: gray;">Inactivo</span>
+                                    <span class="text-gray">Inactivo</span>
                                 <?php endif; ?>
                             </td>
                             <td>
                                 <?php if ($u['id'] != $_SESSION['user']['id']): ?>
                                     <?php if ($u['activo'] == 1): ?>
                                         <a href="usuarios.php?action=baja&id=<?php echo $u['id']; ?>" 
-                                           onclick="return confirm('¿Seguro que deseas desactivar este usuario?');"
-                                           style="color: red; text-decoration: none;">
+                                           class="link-danger btn-confirm-action"
+                                           data-confirm-message="¿Seguro que deseas desactivar este usuario?">
                                            Desactivar
                                         </a>
                                     <?php else: ?>
-                                        <span style="color: #999;">Baja</span>
+                                        <span class="text-gray-light">Baja</span>
                                     <?php endif; ?>
                                 <?php else: ?>
-                                    <span style="font-size: 0.8em; color: #555;">(Tú)</span>
+                                    <span class="text-small-muted">(Tú)</span>
                                 <?php endif; ?>
                             </td>
                         </tr>

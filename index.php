@@ -28,36 +28,36 @@ if (isset($_SESSION['error_mensaje'])) {
       </div>
 
       <?php if (!empty($error)): ?>
-        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border: 1px solid #f5c6cb; border-radius: 5px; text-align: center;">
+        <div class="alert-custom-danger text-center">
             <?php echo htmlspecialchars($error); ?>
         </div>
       <?php endif; ?>
 
       <form method="POST" action="includes/auth.php" novalidate>
-        
-        <div style="margin-bottom: 15px;">
-          <label for="user">Usuario</label><br>
-          <input type="text" 
-            id="user" 
-            name="user" 
-            required 
-            autocomplete="username"
-            placeholder="Ingresa tu usuario"
-            style="width: 100%; padding: 8px;"> </div>
+        <div class="form-index">
+          <div class="mb-15">
+            <label for="user">Usuario</label><br>
+            <input type="text" 
+              id="user" 
+              name="user" 
+              required 
+              autocomplete="username"
+              placeholder="Ingresa tu usuario"
+              class="input-padded"> </div>
 
-        <div style="margin-bottom: 15px;">
-          <label for="pass">Contraseña</label><br>
-          <input 
-            type="password" 
-            id="pass" 
-            name="pass" 
-            required 
-            autocomplete="current-password"
-            placeholder="Ingresa tu contraseña"
-            style="width: 100%; padding: 8px;">
+          <div class="mb-15">
+            <label for="pass">Contraseña</label><br>
+            <input 
+              type="password" 
+              id="pass" 
+              name="pass" 
+              required 
+              autocomplete="current-password"
+              placeholder="Ingresa tu contraseña"
+              class="input-padded">
+          </div>
         </div>
-
-        <button type="submit" class="btn-login">
+        <button type="submit" class="btn-general">
           Ingresar
         </button>
       </form>

@@ -78,12 +78,12 @@ if (!isset($_SESSION['carrito'])) {
 
        
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
 
     </div>
 
-    <div class="container main-content">
+    <div class="main-container">
       <h2>Punto de Venta</h2>
       <p class="text-sm text-gray">Atendido por: <strong><?php echo htmlspecialchars($cajero_nombre); ?></strong></p>
       
@@ -94,7 +94,7 @@ if (!isset($_SESSION['carrito'])) {
           placeholder="Escanear código de barras o ingresar manual..." 
           autofocus
           class="flex-grow w-auto">
-        <button id="btn-buscar" class="btn w-150">Buscar</button> 
+        <button id="btn-buscar" class="btn-general w-150">Buscar</button> 
       </div>
 
       <div class="card">
@@ -111,7 +111,7 @@ if (!isset($_SESSION['carrito'])) {
           </thead>
           <tbody id="tabla-carrito">
             <tr>
-                <td colspan="5" style="text-align: center; color: #777;">Escanea un producto para comenzar...</td>
+                <td colspan="5" class="text-center-muted">Escanea un producto para comenzar...</td>
             </tr>
           </tbody>
         </table>
@@ -121,11 +121,11 @@ if (!isset($_SESSION['carrito'])) {
         Total: <span id="total-display">$0.00</span>
       </div>
 
-      <div class="flex-row mt-15" style="justify-content: flex-end; gap: 15px;">
-        <button id="btn-cancelar" class="btn" style="background-color: #777;">
+      <div class="flex-row mt-15 flex-end-gap">
+        <button id="btn-cancelar" class="btn-general">
           Cancelar Venta
         </button>
-        <button id="btn-cobrar" class="btn">
+        <button id="btn-cobrar" class="btn-general">
           Confirmar Venta y Cobrar
         </button>
       </div>

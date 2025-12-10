@@ -28,30 +28,28 @@ $rol = $usuario['rol'];
         
         <div class="navbar-user-info">
             <span class="user-text">Hola, <strong><?php echo htmlspecialchars($nombre_usuario); ?></strong> (<?php echo ucfirst($rol); ?>)</span>
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
     </div>
 </header>
-
-    <div class="container-dashboard">
+    <div class="main-container">
        
         <div class="welcome-banner">
             <h2>Panel de Control</h2>
             <p>Bienvenido al sistema de gestión de la librería.</p>
         </div>
-
         <div class="dashboard-grid">
             
             <div class="card">
                 <h3>Punto de Venta</h3>
                 <p>Realizar ventas, cobrar y emitir tickets.</p>
-                <a href="ventas.php" class="btn w-full" style="display:block; text-align:center;">Ir a Caja</a>
+                <a href="ventas.php" class="btn-general w-full">Ir a Caja</a>
             </div>
 
             <div class="card">
                 <h3>Devoluciones</h3>
                 <p>Gestionar devoluciones de productos.</p>
-                <a href="devoluciones.php" class="btn w-full" style="display:block; text-align:center;">Ir a Devoluciones</a>
+                <a href="devoluciones.php" class="btn-general w-full">Ir a Devoluciones</a>
             </div>
         </div>
 <?php if ($rol === 'admin'): ?>

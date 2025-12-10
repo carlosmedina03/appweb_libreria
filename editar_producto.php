@@ -131,22 +131,19 @@ if ($resultado && $resultado->num_rows > 0) {
                 </div>
             <?php endif; ?>
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
 
     </div>
 
-    <div class="container main-content-large">
+    <div class="main-container">
         <div class="flex-between mb-15">
             <h2>Editando Producto: "<?php echo htmlspecialchars($producto['titulo']); ?>"</h2>
-            <a href="productos.php" class="btn" style="background-color: #555;">Volver al Listado</a>
+            <a href="productos.php" class="btn-general">Volver al Listado</a>
         </div>
 
         <?php if (!empty($mensaje)): ?>
-            <div style="padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center; 
-                background-color: <?php echo strpos($mensaje, 'Error') !== false ? '#f8d7da' : '#d4edda'; ?>;
-                color: <?php echo strpos($mensaje, 'Error') !== false ? '#721c24' : '#155724'; ?>;
-                border: 1px solid <?php echo strpos($mensaje, 'Error') !== false ? '#f5c6cb' : '#c3e6cb'; ?>;">
+            <div class="<?php echo strpos($mensaje, 'Error') !== false ? 'alert-custom-danger' : 'alert-custom-success'; ?> text-center">
                 <?php echo htmlspecialchars($mensaje); ?>
             </div>
         <?php endif; ?>
@@ -154,30 +151,30 @@ if ($resultado && $resultado->num_rows > 0) {
         <div class="card mb-30">
             <form method="POST" action="editar_producto.php?id=<?php echo $id_producto; ?>" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="editar">
-                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="grid-2-cols">
                     <div>
                         <label for="codigo">Código (ISBN/SKU)</label><br>
-                        <input type="text" id="codigo" name="codigo" required value="<?php echo htmlspecialchars($producto['codigo']); ?>" style="width: 100%; padding: 8px;">
+                        <input type="text" id="codigo" name="codigo" required value="<?php echo htmlspecialchars($producto['codigo']); ?>" class="input-padded">
 
                         <br><br>
                         <label for="titulo">Título del Libro</label><br>
-                        <input type="text" id="titulo" name="titulo" required value="<?php echo htmlspecialchars($producto['titulo']); ?>" style="width: 100%; padding: 8px;">
+                        <input type="text" id="titulo" name="titulo" required value="<?php echo htmlspecialchars($producto['titulo']); ?>" class="input-padded">
                     
                     </div>
                     <div>
                         <label for="precio">Precio de Venta</label><br>
-                        <input type="number" id="precio" name="precio" required step="0.01" min="0" value="<?php echo htmlspecialchars($producto['precio_venta']); ?>" style="width: 100%; padding: 8px;">
+                        <input type="number" id="precio" name="precio" required step="0.01" min="0" value="<?php echo htmlspecialchars($producto['precio_venta']); ?>" class="input-padded">
                         
                         <br><br>
                         <label for="imagen">Cambiar Imagen (Opcional)</label><br>
-                        <input type="file" id="imagen" name="imagen" accept="image/*" class="w-full" style="padding: 7px 0;">
+                        <input type="file" id="imagen" name="imagen" accept="image/*" class="w-full file-input-padded">
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 20px; margin-top: 15px;">
-                    <button type="submit" class="btn">Guardar Cambios</button>
+                    <button type="submit" class="btn-general">Guardar Cambios</button>
                     <div>
-                        <p style="margin: 0; font-size: 12px; color: #555;">Imagen actual:</p>
-                        <img src="img.php?tipo=producto&id=<?php echo $id_producto; ?>" alt="Portada actual" style="width: 50px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                        <p class="text-gray" style="margin: 0; font-size: 12px;">Imagen actual:</p>
+                        <img src="img.php?tipo=producto&id=<?php echo $id_producto; ?>" alt="Portada actual" class="img-product-small">
                     </div>
                 </div>
             </form>
