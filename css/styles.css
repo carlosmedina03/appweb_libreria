@@ -835,6 +835,31 @@ table th {
     font-weight: bold;
 }
 
+
+/* =========================================
+   TABLAS RESPONSIVAS (SCROLL HORIZONTAL)
+========================================= */
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; 
+    margin-bottom: 15px;
+    border-radius: 6px;
+}
+
+.table-responsive table {
+    min-width: 600px; 
+}
+
+
+@media (max-width: 768px) {
+    th, td {
+        font-size: 13px; 
+        padding: 8px 5px; 
+    }
+}
+
 /* =========================================
    ESTILOS DASHBOARD MÓVIL (TIPO ESCRITORIO)
 ========================================= */

@@ -33,7 +33,7 @@ if (!isset($_SESSION['carrito'])) {
         <div class="navbar-logo">
             <img src="assets/img/logo-maria-de-letras_v2.svg" alt="Logo">
         </div>
-
+        
         <button class="menu-toggle" id="mobile-menu-btn">
             <span></span>
             <span></span>
@@ -41,6 +41,9 @@ if (!isset($_SESSION['carrito'])) {
         </button>
 
         <div class="navbar-menu" id="navbar-menu">
+              <button onclick="sincronizarVentas()" class="btn btn-warning">
+                Sincronizar (Offline)
+              </button>
 
             <div class="dropdown">
                 <button class="dropbtn">Cajero ▾</button>
@@ -72,6 +75,8 @@ if (!isset($_SESSION['carrito'])) {
                     </div>  
                 </div>
             <?php endif; ?>
+
+       
             
             <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
         </div>
@@ -129,6 +134,20 @@ if (!isset($_SESSION['carrito'])) {
     
     <script src="js/main.js"></script>
     <script src="js/ventas.js"></script>
+    <script src="js/offline_manager.js"></script>
+
+    <script>
+      // Registro del Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('sw.js').then(function(registration) {
+            console.log('SW registrado con éxito: ', registration.scope);
+          }, function(err) {
+            console.log('SW falló: ', err);
+          });
+        });
+      }
+    </script>
     
   </body>
 </html>

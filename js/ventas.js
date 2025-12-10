@@ -64,42 +64,106 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let carritoActual = {}; // Variable para mantener el estado del carrito en el frontend
 
-    // NUEVA FUNCIÓN: Carga el estado del carrito desde la sesión
+// NUEVA FUNCIÓN: Carga el estado del carrito desde la sesión
     async function cargarCarritoInicial() {
+        // CORRECCIÓN: Si no hay internet, iniciamos vacío y evitamos el error rojo
+        if (!navigator.onLine) {
+            console.log("Offline: Iniciando con carrito vacío visualmente.");
+            carritoActual = {};
+            renderizarCarrito();
+            return;
+        }
+
         try {
-            // Este endpoint no existe, pero si lo creas, esta es la lógica
-            const res = await fetch("ajax/carrito_get.php"); // Devuelve el contenido de $_SESSION['carrito']
+            const res = await fetch("ajax/carrito_get.php"); 
             if (!res.ok) return;
             const data = await res.json();
-            carritoActual = data.carrito || {}; // Actualizar estado local
+            carritoActual = data.carrito || {}; 
             renderizarCarrito();
         } catch (error) {
             console.error("Error al cargar el carrito inicial:", error);
         }
     }
-    
-    // 2. Función para buscar producto en el Backend
+    // 2. Función HÍBRIDA para buscar producto
     async function buscarProducto(codigo) {
+        console.log("Buscando: " + codigo);
+
+        // INTENTO 1: BUSCAR EN SERVIDOR (ONLINE)
         try {
-            // Llamada al endpoint del Rol 4
             const respuesta = await fetch(`ajax/buscar_producto.php?q=${codigo}`);
+            if (!respuesta.ok) throw new Error("Error servidor");
             const productos = await respuesta.json();
 
             if (productos.length > 0) {
-                // Si encuentra, tomamos el primero (asumiendo código único)
                 agregarAlCarrito(productos[0]);
             } else {
-                alert("Producto no encontrado");
-                inputCodigo.value = ""; // Limpiar para siguiente escaneo
+                alert("Producto no encontrado en servidor.");
+                inputCodigo.value = "";
                 inputCodigo.focus();
             }
+
         } catch (error) {
-            console.error("Error buscando producto:", error);
+            // INTENTO 2: MODO OFFLINE (Aquí es donde entra tu sistema cuando falla el internet)
+            console.warn("Sin conexión (" + error.message + "). Buscando en local...");
+
+            // Verificamos si existe la función de búsqueda local
+            if (typeof buscarProductoOffline === 'function') {
+                try {
+                    const productoLocal = await buscarProductoOffline(codigo);
+                    
+                    if (productoLocal) {
+                        // Adaptamos los datos para el carrito
+                        const prodAdaptado = {
+                            id: productoLocal.id,
+                            titulo: productoLocal.titulo, 
+                            precio_venta: productoLocal.precio_venta,
+                            codigo: productoLocal.codigo
+                        };
+                        agregarAlCarrito(prodAdaptado);
+                    } else {
+                        alert("Producto no encontrado en catálogo offline.");
+                        inputCodigo.value = "";
+                        inputCodigo.focus();
+                    }
+                } catch (err) {
+                    console.error("Error buscando en local:", err);
+                }
+            } else {
+                console.error("Falta la función buscarProductoOffline en offline_manager.js");
+            }
         }
     }
 
-    // 3. Función para agregar al carrito (Sesión PHP)
+// 3. Función para agregar al carrito (Blindada)
     async function agregarAlCarrito(producto) {
+        
+        // Función interna para guardar en local (Plan B)
+        const guardarEnLocal = () => {
+            console.log("Usando carrito local...");
+            const id = producto.id;
+            if (carritoActual[id]) {
+                carritoActual[id].cantidad++;
+            } else {
+                carritoActual[id] = {
+                    id: producto.id,
+                    titulo: producto.titulo || producto.nombre,
+                    precio: producto.precio_venta || producto.precio,
+                    cantidad: 1,
+                    codigo: producto.codigo 
+                };
+            }
+            renderizarCarrito();
+            inputCodigo.value = "";
+            inputCodigo.focus();
+        };
+
+        // 1. Si físicamente no hay red, Plan B directo
+        if (!navigator.onLine) {
+            guardarEnLocal();
+            return;
+        }
+
+        // 2. Intentamos conectar (Plan A)
         const formData = new FormData();
         formData.append("id", producto.id);
         formData.append("titulo", producto.titulo);
@@ -110,21 +174,37 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "POST",
                 body: formData
             });
+            // Si el servidor responde error (o está apagado), lanzamos error
+            if (!res.ok) throw new Error("Fallo servidor");
+            
             const data = await res.json();
-
             if (data.status === "ok") {
-                carritoActual = data.carrito; // Actualizar estado local
+                carritoActual = data.carrito; 
                 renderizarCarrito();
                 inputCodigo.value = "";
-                inputCodigo.focus(); // Regresar foco al scanner
+                inputCodigo.focus(); 
             }
         } catch (error) {
-            console.error("Error agregando al carrito:", error);
+            // 3. ¡AQUÍ ESTÁ LA SOLUCIÓN!
+            // Si Apache está apagado pero tienes WiFi, el código cae aquí.
+            console.warn("Fallo al conectar con PHP. Guardando en local.");
+            guardarEnLocal();
         }
     }
 
-    // 3.B. Función para REMOVER del carrito (Sesión PHP)
+   // 3.B. Función para REMOVER (Blindada)
     async function removerDelCarrito(id) {
+        
+        const borrarLocal = () => {
+            if (carritoActual[id]) {
+                delete carritoActual[id];
+                renderizarCarrito();
+            }
+            inputCodigo.focus();
+        };
+
+        if (!navigator.onLine) { borrarLocal(); return; }
+
         const formData = new FormData();
         formData.append("id", id);
 
@@ -133,38 +213,41 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "POST",
                 body: formData
             });
+            if (!res.ok) throw new Error("Fallo servidor");
             const data = await res.json();
-
             if (data.status === "ok") {
-                carritoActual = data.carrito; // Actualizar estado local
+                carritoActual = data.carrito; 
                 renderizarCarrito();
-                inputCodigo.focus(); // Devolver foco al scanner
-            } else {
-                alert("Error: " + (data.msg || "No se pudo quitar el producto."));
+                inputCodigo.focus(); 
             }
         } catch (error) {
-            console.error("Error removiendo del carrito:", error);
+            borrarLocal(); // Si falla, borramos local
         }
     }
 
-    // 3.C. Función para CANCELAR toda la venta
+    // 3.C. Función para CANCELAR (Blindada)
     async function cancelarVenta() {
-        if (confirm('¿Está seguro de que desea cancelar toda la venta? Se vaciará el carrito.')) {
-            try {
-                const res = await fetch("ajax/carrito_clear.php", { method: "POST" });
-                const data = await res.json();
+        if (!confirm('¿Cancelar venta? Se vaciará el carrito.')) return;
 
-                if (data.status === 'ok') {
-                    carritoActual = {}; // Limpiar estado local
-                    renderizarCarrito(); // Renderiza el carrito vacío
-                    inputCodigo.focus();
-                } else {
-                    alert('Error al cancelar la venta.');
-                }
-            } catch (error) {
-                console.error("Error cancelando venta:", error);
-                alert('Error de conexión al cancelar la venta.');
+        const borrarLocal = () => {
+            carritoActual = {};
+            renderizarCarrito();
+            inputCodigo.focus();
+        };
+
+        if (!navigator.onLine) { borrarLocal(); return; }
+
+        try {
+            const res = await fetch("ajax/carrito_clear.php", { method: "POST" });
+            if (!res.ok) throw new Error("Fallo servidor");
+            const data = await res.json();
+            if (data.status === 'ok') {
+                carritoActual = {}; 
+                renderizarCarrito(); 
+                inputCodigo.focus();
             }
+        } catch (error) {
+            borrarLocal(); // Si falla, borramos local
         }
     }
 
@@ -182,7 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const row = `
                 <tr>
                     <td>${item.titulo}</td>
-                    <!-- CORRECCIÓN 1: Añadir clases de ancho para alinear con cabecera -->
                     <td class="text-center col-10">${item.cantidad}</td>
                     <td class="text-right col-15">$${parseFloat(item.precio).toFixed(2)}</td>
                     <td class="text-right col-15">$${subtotal.toFixed(2)}</td>
@@ -203,28 +285,78 @@ document.addEventListener("DOMContentLoaded", () => {
         if (totalDisplay) totalDisplay.innerText = `$${total.toFixed(2)}`;
     }
 
-    // 5. Confirmar Venta
+    // 5. Confirmar Venta (Blindado a prueba de fallos)
     if (btnCobrar) {
         btnCobrar.addEventListener("click", async () => {
+            
+            if (Object.keys(carritoActual).length === 0) {
+                alert("El carrito está vacío");
+                return;
+            }
+
             if (!confirm("¿Confirmar venta y generar ticket?")) return;
 
+            // --- FUNCIÓN INTERNA: PLAN B (OFFLINE) ---
+            const procesarVentaOffline = () => {
+                console.log("Procesando venta offline...");
+                
+                // 1. Convertimos el carrito a array
+                const productosArray = Object.values(carritoActual);
+                
+                // 2. Calculamos total
+                const totalVenta = productosArray.reduce((acc, item) => acc + (item.cantidad * parseFloat(item.precio)), 0);
+
+                // GENERAR FOLIO TEMPORAL ÚNICO
+                // Tomamos los últimos 9 dígitos del tiempo actual para que sea único
+                const folioUnico = "OFF-" + Date.now().toString().slice(-9);
+
+                const datosVenta = {
+                    total: totalVenta.toFixed(2),
+                    productos: productosArray,
+                    folio: folioUnico
+                };
+
+                // 3. Guardamos en IndexedDB
+                if (typeof guardarVentaOffline === 'function') {
+                    guardarVentaOffline(datosVenta);
+                    
+                    // Limpiamos todo
+                    carritoActual = {};
+                    renderizarCarrito();
+                } else {
+                    alert("Error crítico: No se encontró la función offline.");
+                }
+            };
+
+            // --- INTENTO 1: SI NO HAY RED FÍSICA ---
+            if (!navigator.onLine) {
+                procesarVentaOffline();
+                return;
+            }
+
+            // --- INTENTO 2: TRATAR DE CONECTAR ONLINE ---
             try {
                 const res = await fetch("ajax/confirmar_venta.php", {
                     method: "POST"
                 });
+                
+                // Si el servidor está apagado o da error, lanzamos excepción
+                if (!res.ok) throw new Error("Fallo servidor");
+
                 const data = await res.json();
 
                 if (data.status === "ok") {
-                    // Abrir ticket para imprimir
+                    // ÉXITO ONLINE
                     window.open(`ticket.php?folio=${data.folio}`, '_blank', 'width=400,height=600');
-                    // Recargar pagina para limpiar
                     window.location.reload();
                 } else {
-                    alert("Error: " + data.msg);
+                    alert("Error del sistema: " + data.msg);
                 }
+
             } catch (error) {
-                console.error("Error en venta:", error);
-                alert("Error de conexión");
+                // --- INTENTO 3: SI FALLÓ LA CONEXIÓN (PLAN B) ---
+                console.warn("Fallo conexión con servidor (" + error.message + "). Guardando offline.");
+                procesarVentaOffline();
             }
         });
     }

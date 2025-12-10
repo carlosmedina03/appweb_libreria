@@ -124,6 +124,7 @@ ob_start();
         Total de Tickets Encontrados: **<?php echo $num_tickets; ?>**
     </p>
     
+    <div class="table-responsive">
     <table>
         <thead>
             <tr class="bg-green"> 

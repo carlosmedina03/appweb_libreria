@@ -104,6 +104,7 @@ ob_start();
         Mostrando **<?php echo count($detalles); ?>** líneas de detalle.
     </p>
     
+    <div class="table-responsive">
     <table>
         <thead>
             <tr class="bg-green"> 

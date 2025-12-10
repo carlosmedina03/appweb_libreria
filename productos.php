@@ -209,6 +209,7 @@ $productos = $mysqli->query($sql_productos);
 
         <div class="card">
             <h3>Listado Completo de Productos</h3>
+            <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
@@ -269,6 +270,7 @@ $productos = $mysqli->query($sql_productos);
                     <?php endif; ?>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
     
