@@ -87,6 +87,7 @@ ob_start();
         Total de Devoluciones (ítems): **<?php echo count($devoluciones); ?>**
     </p>
     
+    <div class="table-responsive">
     <table>
         <thead>
             <tr class="bg-green"> 

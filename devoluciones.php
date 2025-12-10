@@ -258,10 +258,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
             });
         }
     </script>
-  </body>
-</html>
-            }
-        });
-    </script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+        // 1. Identificamos el formulario y el input
+        // Ajusta los selectores si tu compañero usó otros nombres/clases
+        const formulario = document.querySelector('form'); 
+        const inputFolio = document.querySelector('input[name="folio_input"]');
+
+        if (formulario && inputFolio) {
+        
+            formulario.addEventListener('submit', async (e) => {
+                const valor = inputFolio.value.trim();
+
+                // 2. ¿Es un folio Offline (tiene letras)?
+                if (valor.toUpperCase().includes('OFF-') || isNaN(valor)) {
+                
+                    // ¡ALTO! No lo envíes todavía al PHP de tu compañero
+                    e.preventDefault(); 
+
+                    try {
+                        // 3. Preguntamos a TU archivo cuál es el ID numérico
+                        const resp = await fetch(`ajax/buscar_id_folio.php?folio=${valor}`);
+                        const data = await resp.json();
+
+                        if (data.status === 'ok') {
+                            // 4.  Reemplaza el texto "OFF-..." por el número "850"
+                            inputFolio.value = data.id_real;
+                        
+                            // 5. Ahora sí, dejamos que el formulario se envíe al PHP original
+                            formulario.submit();
+                        } else {
+                            alert("Ese Folio Offline no existe o no ha sido sincronizado.");
+                        }
+                    } catch (error) {
+                        console.error("Error al traducir folio:", error);
+                    }
+                }
+                // Si es solo números, no hacemos nada y dejamos que pase normal.
+            });
+        }
+    });
+    </script>     
   </body>
 </html>

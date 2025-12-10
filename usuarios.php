@@ -145,6 +145,8 @@ while ($row = $resultado->fetch_assoc()) {
 
         <div class="card">
             <h3>Listado de Empleados</h3>
+
+            <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
