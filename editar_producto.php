@@ -131,15 +131,15 @@ if ($resultado && $resultado->num_rows > 0) {
                 </div>
             <?php endif; ?>
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
 
     </div>
 
-    <div class="container main-content-large">
+    <div class="main-container">
         <div class="flex-between mb-15">
             <h2>Editando Producto: "<?php echo htmlspecialchars($producto['titulo']); ?>"</h2>
-            <a href="productos.php" class="btn btn-secondary">Volver al Listado</a>
+            <a href="productos.php" class="btn-general">Volver al Listado</a>
         </div>
 
         <?php if (!empty($mensaje)): ?>
@@ -171,7 +171,7 @@ if ($resultado && $resultado->num_rows > 0) {
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 20px; margin-top: 15px;">
-                    <button type="submit" class="btn">Guardar Cambios</button>
+                    <button type="submit" class="btn-general">Guardar Cambios</button>
                     <div>
                         <p class="text-gray" style="margin: 0; font-size: 12px;">Imagen actual:</p>
                         <img src="img.php?tipo=producto&id=<?php echo $id_producto; ?>" alt="Portada actual" class="img-product-small">

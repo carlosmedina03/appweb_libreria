@@ -162,12 +162,12 @@ $productos = $mysqli->query($sql_productos);
                 </div>
             <?php endif; ?>
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
 
     </div>
 
-    <div class="container main-content-large">
+    <div class="main-container">
         <div class="flex-between mb-15">
             <h2>Gestión de Inventario (Productos)</h2>
         </div>
@@ -200,7 +200,7 @@ $productos = $mysqli->query($sql_productos);
                         <input type="file" id="imagen" name="imagen" accept="image/*" class="w-full file-input-padded">
                     </div>
                 </div>
-                <button type="submit" class="btn mt-15">Guardar Producto</button>
+                <button type="submit" class="btn-general mt-15">Guardar Producto</button>
             </form>
         </div>
 
@@ -236,19 +236,19 @@ $productos = $mysqli->query($sql_productos);
                                 </td>
 
                                 <td class="text-center text-nowrap">
-                                    <a href="editar_producto.php?id=<?php echo $producto['id']; ?>" class="btn-sm btn-edit">
+                                    <a href="editar_producto.php?id=<?php echo $producto['id']; ?>" class="btn-editar">
                                             Editar
                                     </a>
     
                                     <?php if ($producto['estatus'] == 1): ?>
                                         <a href="productos.php?action=desactivar&id=<?php echo $producto['id']; ?>" 
-                                            class="btn-sm btn-delete btn-confirm-action"
+                                            class="btn-desactivar btn-confirm-action"
                                             data-confirm-message="¿Estás seguro de que quieres desactivar este producto? No aparecerá en ventas.">
                                                 Desactivar
                                         </a>
                                     <?php else: ?>
                                         <a href="productos.php?action=activar&id=<?php echo $producto['id']; ?>" 
-                                            class="btn-sm btn-save btn-confirm-action"
+                                            class="btn-general btn-confirm-action"
                                             data-confirm-message="¿Estás seguro de que quieres activar este producto?">
                                                 Activar
                                         </a>

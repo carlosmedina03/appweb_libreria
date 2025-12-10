@@ -124,12 +124,12 @@ while ($row = $resultado->fetch_assoc()) {
                 </div>
             <?php endif; ?>
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
 
     </div>
 
-    <div class="container main-content">
+    <div class="main-container">
         <div class="flex-between mb-15">
             <h2>Administración de Usuarios</h2>
         </div>

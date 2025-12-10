@@ -73,12 +73,12 @@ if (!isset($_SESSION['carrito'])) {
                 </div>
             <?php endif; ?>
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
 
     </div>
 
-    <div class="container main-content">
+    <div class="main-container">
       <h2>Punto de Venta</h2>
       <p class="text-sm text-gray">Atendido por: <strong><?php echo htmlspecialchars($cajero_nombre); ?></strong></p>
       
@@ -89,7 +89,7 @@ if (!isset($_SESSION['carrito'])) {
           placeholder="Escanear código de barras o ingresar manual..." 
           autofocus
           class="flex-grow w-auto">
-        <button id="btn-buscar" class="btn w-150">Buscar</button> 
+        <button id="btn-buscar" class="btn-general w-150">Buscar</button> 
       </div>
 
       <div class="card">
@@ -117,10 +117,10 @@ if (!isset($_SESSION['carrito'])) {
       </div>
 
       <div class="flex-row mt-15 flex-end-gap">
-        <button id="btn-cancelar" class="btn btn-secondary">
+        <button id="btn-cancelar" class="btn-general">
           Cancelar Venta
         </button>
-        <button id="btn-cobrar" class="btn">
+        <button id="btn-cobrar" class="btn-general">
           Confirmar Venta y Cobrar
         </button>
       </div>

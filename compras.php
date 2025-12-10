@@ -83,12 +83,12 @@ if (isset($mysqli)) {
                 </div>
             <?php endif; ?>
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
 
     </div>
 
-    <div class="container main-content">
+    <div class="main-container">
         <h2>Registro de Orden de Compra</h2>
 
         <div class="card">
@@ -120,7 +120,7 @@ if (isset($mysqli)) {
                     id="input-producto-compra" 
                     placeholder="Buscar producto por título o código..." 
                     class="flex-grow w-auto">
-                <button type="button" id="btn-agregar-item" class="btn w-150">Agregar Item</button>
+                <button type="button" id="btn-agregar-item" class="btn-general w-150">Agregar Item</button>
             </div>
 
             <table>
@@ -145,7 +145,7 @@ if (isset($mysqli)) {
                 Total Compra: <span id="total-compra-display">$0.00</span>
             </div>
 
-            <button id="btn-guardar-compra" class="btn mt-20">
+            <button id="btn-guardar-compra" class="btn-general mt-20">
                 Guardar Orden de Compra
             </button>
         </div>

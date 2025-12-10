@@ -34,30 +34,30 @@ if (isset($_SESSION['error_mensaje'])) {
       <?php endif; ?>
 
       <form method="POST" action="includes/auth.php" novalidate>
-        
-        <div class="mb-15">
-          <label for="user">Usuario</label><br>
-          <input type="text" 
-            id="user" 
-            name="user" 
-            required 
-            autocomplete="username"
-            placeholder="Ingresa tu usuario"
-            class="input-padded"> </div>
+        <div class="form-index">
+          <div class="mb-15">
+            <label for="user">Usuario</label><br>
+            <input type="text" 
+              id="user" 
+              name="user" 
+              required 
+              autocomplete="username"
+              placeholder="Ingresa tu usuario"
+              class="input-padded"> </div>
 
-        <div class="mb-15">
-          <label for="pass">Contraseña</label><br>
-          <input 
-            type="password" 
-            id="pass" 
-            name="pass" 
-            required 
-            autocomplete="current-password"
-            placeholder="Ingresa tu contraseña"
-            class="input-padded">
+          <div class="mb-15">
+            <label for="pass">Contraseña</label><br>
+            <input 
+              type="password" 
+              id="pass" 
+              name="pass" 
+              required 
+              autocomplete="current-password"
+              placeholder="Ingresa tu contraseña"
+              class="input-padded">
+          </div>
         </div>
-
-        <button type="submit" class="btn-login">
+        <button type="submit" class="btn-general">
           Ingresar
         </button>
       </form>

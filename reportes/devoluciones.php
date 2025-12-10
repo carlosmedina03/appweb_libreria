@@ -62,10 +62,10 @@ ob_start();
                        class="filter-input">
             </div>
             
-            <button type="submit" class="btn w-150">
+            <button type="submit" class="btn-general w-150">
                 Generar Reporte
             </button>
-            <button type="button" class="btn w-150 btn-print">
+            <button type="button" class="btn-general w-150 btn-print">
                 Imprimir / PDF
             </button>
 
@@ -75,7 +75,7 @@ ob_start();
                        '&inicio=' . urlencode($fecha_ini_input) . 
                        '&fin=' . urlencode($fecha_fin_input);
             ?>
-            <a href="<?php echo $csv_url; ?>" class="btn w-150">
+            <a href="<?php echo $csv_url; ?>" class="btn-general w-150">
                 Exportar CSV
             </a>
         </div>

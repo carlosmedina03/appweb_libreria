@@ -106,12 +106,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
                 </div>
             <?php endif; ?>
             
-            <a href="includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
 
     </div>
 
-    <div class="container main-content-small">
+    <div class="main-container">
         <h2>Gestión de Devoluciones</h2>
 
         <?php if (!empty($mensaje_error)): ?>
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
                         required 
                         class="flex-grow w-auto"
                         value="<?php echo isset($_POST['folio_input']) ? htmlspecialchars($_POST['folio_input']) : ''; ?>">
-                    <button type="submit" class="btn w-150">Buscar Venta</button>
+                    <button type="submit" class="btn-general w-150">Buscar Venta</button>
                 </div>
             </form>
         </div>
@@ -189,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['folio_input'])) {
                     <input type="text" id="motivo_devolucion" name="motivo_devolucion" placeholder="Ej: Defecto de fábrica, cliente se arrepintió..." class="w-full">
                 </div>
                 <div class="text-right">
-                    <button type="button" id="btn-procesar-devolucion" class="btn mt-15 btn-danger-custom">
+                    <button type="button" id="btn-procesar-devolucion" class="btn-general mt-15">
                         Procesar Devolución Seleccionada
                     </button>
                 </div>

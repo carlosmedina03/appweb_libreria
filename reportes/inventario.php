@@ -68,10 +68,10 @@ ob_start();
                 </select>
             </div>
             
-            <button type="submit" class="btn w-150">
+            <button type="submit" class="btn-general w-150">
                 Filtrar
             </button>
-            <button type="button" class="btn w-150 btn-print">
+            <button type="button" class="btn-general w-150 btn-print">
                 Imprimir / PDF
             </button>
             <?php 
@@ -80,7 +80,7 @@ ob_start();
                        '&q=' . urlencode($filtro_q) . 
                        '&activos=' . ($solo_activos ? '1' : '0');
             ?>
-            <a href="<?php echo $csv_url; ?>" class="btn w-150">
+            <a href="<?php echo $csv_url; ?>" class="btn-general w-150">
                 Exportar CSV
             </a>
         </div>

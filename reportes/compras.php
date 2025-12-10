@@ -83,11 +83,11 @@ ob_start();
                 </select>
             </div>
             
-            <button type="submit" class="btn w-150">
+            <button type="submit" class="btn-general w-150">
                 Generar Reporte
             </button>
             
-            <button type="button" class="btn w-150 btn-print">
+            <button type="button" class="btn-general w-150 btn-print">
                 Imprimir / PDF
             </button>
             
@@ -98,7 +98,7 @@ ob_start();
                        '&fin=' . urlencode($fecha_fin_input) .
                        '&proveedor=' . urlencode($id_proveedor_filtro);
             ?>
-            <a href="<?php echo $csv_url; ?>" class="btn w-150">
+            <a href="<?php echo $csv_url; ?>" class="btn-general w-150">
                 Exportar CSV
             </a>
             

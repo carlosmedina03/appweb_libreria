@@ -64,13 +64,13 @@ $usuario_gen = 'Administrador'; // Placeholder for static version
                 </div>
             <?php endif; ?>
             
-            <a href="../includes/logout.php" class="cerrar-sesion">Cerrar Sesión</a>
+            <a href="../includes/logout.php" class="btn-general">Cerrar Sesión</a>
         </div>
     </div>
 
  
 
-    <div class="container main-content-large">
+    <div class="main-container">
         <div class="report-header">
             <img src="../assets/img/logo-maria-de-letras_icon.svg" alt="Logo" style="height: 50px;">
             <h1 class="report-title"><?php echo htmlspecialchars($titulo_reporte ?? 'REPORTE'); ?></h1>
